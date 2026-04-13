@@ -8,15 +8,14 @@
 <title>My Business AI | TeaJay Konsult Ltd.</title>
 <link rel="manifest" href="manifest.json"/>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-<!-- Chart.js for graphs -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<!-- Firebase SDKs -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
 <style>
-/* (your existing CSS – unchanged) */
+/* ========== ORIGINAL STYLES (unchanged) ========== */
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 :root{
 --bg:#0a0e1a;
@@ -41,10 +40,348 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 h1,h2,h3,h4{font-family:'Syne',sans-serif}
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-thumb{background:var(--cyan-dark);border-radius:4px}
-
 .glass{background:rgba(15,22,40,0.7);backdrop-filter:blur(10px);border:1px solid var(--cyan-border);}
 .transition-all{transition:all 0.2s ease;}
 
+/* Landing page styles */
+.landing {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+.landing-header {
+  background: #0f1628;
+  border-bottom: 1px solid rgba(0,212,255,0.2);
+  padding: 20px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.logo h1 {
+  font-size: 24px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #00d4ff, #0099bb);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+.logo p {
+  font-size: 12px;
+  color: #8892a4;
+  margin-top: 4px;
+}
+.nav-buttons {
+  display: flex;
+  gap: 12px;
+}
+.btn-outline {
+  background: transparent;
+  border: 1.5px solid rgba(0,212,255,0.4);
+  color: #00d4ff;
+  padding: 8px 20px;
+  border-radius: 40px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-outline:hover {
+  border-color: #00d4ff;
+  background: rgba(0,212,255,0.1);
+}
+.btn-primary {
+  background: linear-gradient(135deg, #0099bb, #00d4ff);
+  border: none;
+  color: #000;
+  padding: 8px 24px;
+  border-radius: 40px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0,212,255,0.3);
+}
+.hero {
+  padding: 100px 32px;
+  background: radial-gradient(circle at 20% 30%, rgba(0,212,255,0.08), transparent 70%);
+}
+.hero-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 60px;
+  flex-wrap: wrap;
+}
+.hero-content {
+  flex: 1;
+}
+.hero-content h1 {
+  font-size: clamp(36px, 5vw, 56px);
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 24px;
+}
+.hero-content h1 span {
+  color: #00d4ff;
+}
+.hero-content p {
+  font-size: 18px;
+  color: #94a3b8;
+  margin-bottom: 32px;
+}
+.hero-stats {
+  display: flex;
+  gap: 32px;
+  margin-top: 40px;
+}
+.stat-number {
+  font-size: 32px;
+  font-weight: 800;
+  color: #00d4ff;
+}
+.stat-label {
+  font-size: 12px;
+  color: #64748b;
+}
+.hero-image img {
+  max-width: 100%;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  border: 1px solid rgba(0,212,255,0.2);
+}
+.features {
+  padding: 80px 32px;
+  background: #0f1628;
+}
+.section-title {
+  text-align: center;
+  font-size: 32px;
+  font-weight: 800;
+  margin-bottom: 48px;
+}
+.section-title span {
+  color: #00d4ff;
+}
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.feature-card {
+  background: #141d35;
+  padding: 28px;
+  border-radius: 24px;
+  border: 1px solid rgba(0,212,255,0.15);
+  transition: 0.2s;
+}
+.feature-card:hover {
+  border-color: #00d4ff;
+  transform: translateY(-4px);
+}
+.feature-icon {
+  font-size: 40px;
+  margin-bottom: 16px;
+}
+.feature-card h3 {
+  font-size: 20px;
+  margin-bottom: 12px;
+  color: #fff;
+}
+.feature-card p {
+  color: #94a3b8;
+}
+.pricing {
+  padding: 80px 32px;
+  background: #0a0e1a;
+}
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 32px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.pricing-card {
+  background: #141d35;
+  border-radius: 28px;
+  padding: 32px;
+  text-align: center;
+  border: 1px solid rgba(0,212,255,0.15);
+}
+.pricing-card.popular {
+  border: 2px solid #00d4ff;
+  position: relative;
+}
+.popular-badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #00d4ff;
+  color: #000;
+  padding: 4px 16px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 800;
+}
+.price {
+  font-size: 36px;
+  font-weight: 800;
+  color: #00d4ff;
+  margin: 20px 0;
+}
+.price span {
+  font-size: 16px;
+  font-weight: 400;
+  color: #94a3b8;
+}
+.pricing-card ul {
+  list-style: none;
+  margin: 24px 0;
+  text-align: left;
+}
+.pricing-card li {
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pricing-card li::before {
+  content: "✓";
+  color: #00d4ff;
+  font-weight: 800;
+}
+.btn-pricing {
+  background: linear-gradient(135deg, #0099bb, #00d4ff);
+  color: #000;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 40px;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 16px;
+}
+.btn-pricing:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.coming-soon-badge {
+  display: inline-block;
+  background: rgba(0,212,255,0.15);
+  color: #00d4ff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 20px;
+  margin-left: 8px;
+}
+.footer {
+  background: #0f1628;
+  text-align: center;
+  padding: 32px;
+  font-size: 12px;
+  color: #64748b;
+  border-top: 1px solid rgba(0,212,255,0.1);
+}
+/* Auth Modal */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(8px);
+  z-index: 2000;
+  justify-content: center;
+  align-items: center;
+}
+.modal-content {
+  background: #0f1628;
+  max-width: 420px;
+  width: 90%;
+  padding: 32px;
+  border-radius: 32px;
+  border: 1px solid rgba(0,212,255,0.3);
+  position: relative;
+}
+.close-modal {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  font-size: 24px;
+  cursor: pointer;
+  color: #94a3b8;
+}
+.modal h2 {
+  margin-bottom: 20px;
+  text-align: center;
+  color: #fff;
+}
+.modal .tab {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #2d3a5e;
+}
+.modal .tab button {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #94a3b8;
+}
+.modal .tab button.active {
+  color: #00d4ff;
+  border-bottom: 2px solid #00d4ff;
+}
+.modal .form-group {
+  margin-bottom: 20px;
+}
+.modal input {
+  width: 100%;
+  padding: 12px;
+  border: 1.5px solid #2d3a5e;
+  border-radius: 16px;
+  background: #141d35;
+  color: #fff;
+  font-size: 15px;
+}
+.modal input:focus {
+  outline: none;
+  border-color: #00d4ff;
+}
+.modal button[type="submit"] {
+  width: 100%;
+  background: linear-gradient(135deg, #0099bb, #00d4ff);
+  color: #000;
+  border: none;
+  padding: 12px;
+  border-radius: 40px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.message {
+  margin-top: 12px;
+  font-size: 13px;
+  text-align: center;
+}
+.error {
+  color: #ff4757;
+}
+.hidden {
+  display: none;
+}
+
+/* Original dashboard styles (identical to your working file) */
 .auth-container{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;}
 .auth-card{background:var(--surface);border:1px solid var(--cyan-border);border-radius:28px;padding:40px 32px;width:100%;max-width:480px;z-index:1;box-shadow:0 20px 60px rgba(0,0,0,0.5);animation:fadeInUp 0.5s ease;}
 .auth-card::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);}
@@ -67,7 +404,6 @@ h1,h2,h3,h4{font-family:'Syne',sans-serif}
 .ob-divider{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
 .ob-divider::before,.ob-divider::after{content:'';flex:1;height:1px;background:var(--border);}
 .ob-divider span{font-size:11px;color:var(--sub);}
-
 .success-overlay {
   position: fixed;
   top: 0;
@@ -119,7 +455,6 @@ h1,h2,h3,h4{font-family:'Syne',sans-serif}
 .new-chat-btn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,212,255,0.3);}
 .sign-out-btn{background:transparent;border:1px solid var(--border);border-radius:12px;padding:10px;margin:16px;color:var(--sub);cursor:pointer;transition:all 0.2s;}
 .sign-out-btn:hover{border-color:var(--red);color:var(--red);}
-
 .main-chat{flex:1;display:flex;flex-direction:column;overflow:hidden;}
 .app-header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
 .menu-toggle{background:none;border:none;color:var(--cyan);font-size:24px;cursor:pointer;display:none;}
@@ -129,21 +464,8 @@ h1,h2,h3,h4{font-family:'Syne',sans-serif}
 .header-actions{display:flex;gap:8px;}
 .hdr-btn{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:12px;font-weight:600;color:var(--sub);cursor:pointer;transition:all .2s;}
 .hdr-btn:hover{border-color:var(--cyan);color:var(--cyan);}
-.pro-btn {
-  background: var(--card);
-  border: 1px solid var(--cyan-border);
-  border-radius: 10px;
-  padding: 8px 14px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--cyan);
-  cursor: pointer;
-  transition: all .2s;
-}
-.pro-btn:hover {
-  border-color: var(--cyan);
-  background: var(--cyan-soft);
-}
+.pro-btn{background:var(--card);border:1px solid var(--cyan-border);border-radius:10px;padding:8px 14px;font-size:12px;font-weight:600;color:var(--cyan);cursor:pointer;transition:all .2s;}
+.pro-btn:hover{border-color:var(--cyan);background:var(--cyan-soft);}
 .categories-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;gap:8px;overflow-x:auto;flex-shrink:0;}
 .topic-pill{padding:7px 14px;background:var(--card);border:1.5px solid var(--border);border-radius:50px;font-size:12px;font-weight:600;color:var(--sub);cursor:pointer;white-space:nowrap;transition:all .2s;}
 .topic-pill.active{background:var(--cyan-soft);border-color:var(--cyan);color:var(--cyan);}
@@ -209,50 +531,9 @@ footer{text-align:center;padding:14px;font-size:11px;color:var(--sub);border-top
 .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:var(--card2);color:var(--text);padding:12px 20px;border-radius:50px;font-size:13px;font-weight:600;z-index:9999;display:none;white-space:nowrap;}
 .fab{position:fixed;bottom:90px;right:20px;background:linear-gradient(135deg,var(--cyan-dark),var(--cyan));color:#000;border:none;border-radius:50px;padding:12px 18px;font-size:13px;font-weight:700;cursor:pointer;display:none;align-items:center;gap:8px;}
 .ios-banner{display:none;background:var(--surface);border:1px solid var(--cyan-border);border-radius:16px;padding:14px 40px 14px 16px;position:fixed;bottom:20px;left:14px;right:14px;z-index:998;}
-
-.modal {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.8);
-  backdrop-filter: blur(5px);
-  z-index: 2000;
-  justify-content: center;
-  align-items: center;
-}
-.modal-content {
-  background: var(--surface);
-  border: 1px solid var(--cyan-border);
-  border-radius: 24px;
-  padding: 32px;
-  max-width: 400px;
-  text-align: center;
-}
-.modal-content h3 {
-  color: var(--cyan);
-  margin-bottom: 16px;
-}
-.modal-content p {
-  margin-bottom: 24px;
-  color: var(--sub);
-}
-.modal-content button {
-  background: linear-gradient(135deg, var(--cyan-dark), var(--cyan));
-  border: none;
-  padding: 10px 24px;
-  border-radius: 40px;
-  font-weight: 700;
-  cursor: pointer;
-  color: #000;
-}
-
 @keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes msgSlide{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-
 @media(max-width:768px){
   .sidebar{position:fixed;left:-100%;transition:left 0.3s;z-index:20;}
   .sidebar.open{left:0;}
@@ -263,77 +544,106 @@ footer{text-align:center;padding:14px;font-size:11px;color:var(--sub);border-top
 </head>
 <body>
 
-<div class="toast" id="toast"></div>
-<button class="fab" id="installBtn">📲 Install App</button>
-<div class="ios-banner" id="iosBanner">
-  <button class="ios-close" onclick="document.getElementById('iosBanner').style.display='none'">✕</button>
-  <p>📲 <strong>Install My Business AI:</strong> Tap <strong>Share</strong> in Safari then <strong>"Add to Home Screen"</strong></p>
-</div>
-
-<div id="successOverlay" class="success-overlay">
-  <div class="success-emoji" id="successEmoji">😊</div>
-  <div class="clap-emoji" id="clapEmoji">👏</div>
-</div>
-
-<div id="authContainer" class="auth-container">
-  <div class="auth-card">
-    <div class="ob-logo" style="text-align:center;margin-bottom:32px;">
-      <div class="ob-icon" style="margin:0 auto 14px;">🧠</div>
-      <h1 style="font-size:24px;">My <span style="color:var(--cyan);">Business AI</span></h1>
-      <p style="font-size:13px;color:var(--sub);">Your personal AI business consultant</p>
+<!-- LANDING PAGE (shown when not logged in) -->
+<div id="landingPage" class="landing">
+  <div class="landing-header">
+    <div class="logo">
+      <h1>🧠 My<span>Business AI</span></h1>
+      <p>by TeaJay Konsult</p>
     </div>
-    <div class="auth-tab">
-      <button class="auth-tab-btn active" data-auth="signin">Sign In</button>
-      <button class="auth-tab-btn" data-auth="signup">Sign Up</button>
+    <div class="nav-buttons">
+      <button class="btn-outline" id="landingSigninBtn">Sign In</button>
+      <button class="btn-primary" id="landingSignupBtn">Sign Up</button>
     </div>
-    <div id="signinForm" class="auth-form active">
-      <span class="ob-label">Email</span>
-      <input class="ob-input" id="signinEmail" type="email" placeholder="your@email.com"/>
-      <span class="ob-label">Password</span>
-      <input class="ob-input" id="signinPassword" type="password" placeholder="••••••••"/>
-      <button class="ob-start" id="signinBtn">Sign In</button>
-      <div id="authMessage" class="auth-message"></div>
-    </div>
-    <div id="signupForm" class="auth-form">
-      <span class="ob-label">Email</span>
-      <input class="ob-input" id="signupEmail" type="email" placeholder="your@email.com"/>
-      <span class="ob-label">Password</span>
-      <input class="ob-input" id="signupPassword" type="password" placeholder="•••••••• (min. 6 characters)"/>
-      <button class="ob-start" id="signupBtn">Create Account</button>
-      <div id="signupMessage" class="auth-message"></div>
-    </div>
-    <div id="profileSetup" style="display:none;">
-      <div class="ob-divider"><span>Business Profile</span></div>
-      <span class="ob-label">Your Name</span>
-      <input class="ob-input" id="userName" type="text" placeholder="e.g. Emeka, Fatima"/>
-      <span class="ob-label">Business Name</span>
-      <input class="ob-input" id="bizName" type="text" placeholder="e.g. Mama's Kitchen"/>
-      <div class="ob-section-title">Business Type</div>
-      <div class="category-grid" id="categoryGrid">
-        <div class="cat-chip" data-cat="Retail & Shop">🛍️ Retail</div>
-        <div class="cat-chip" data-cat="Restaurant & Food">🍽️ Restaurant</div>
-        <div class="cat-chip" data-cat="Tech & Software">💻 Tech</div>
-        <div class="cat-chip" data-cat="Freelance & Services">💼 Freelance</div>
-        <div class="cat-chip" data-cat="Agriculture & Farming">🌾 Agriculture</div>
-        <div class="cat-chip" data-cat="Fashion & Beauty">👗 Fashion</div>
-        <div class="cat-chip" data-cat="Education & Training">📚 Education</div>
-        <div class="cat-chip" data-cat="Healthcare & Wellness">🏥 Healthcare</div>
-        <div class="cat-chip" data-cat="Real Estate">🏠 Real Estate</div>
-        <div class="cat-chip" data-cat="E-commerce">🛒 E‑commerce</div>
+  </div>
+  <div class="hero">
+    <div class="hero-container">
+      <div class="hero-content">
+        <h1>AI Business Consultant<br>for <span>African Entrepreneurs</span></h1>
+        <p>Get expert advice on growth, finance, marketing, and more. Tailored for the African business environment. Free tier available.</p>
+        <div class="cta-buttons" style="display: flex; gap: 16px; flex-wrap: wrap;">
+          <button class="btn-primary" id="heroSignupBtn">Start Free →</button>
+          <button class="btn-outline" id="heroSigninBtn">Sign In</button>
+        </div>
+        <div class="hero-stats">
+          <div><div class="stat-number">24/7</div><div class="stat-label">Always Available</div></div>
+          <div><div class="stat-number">100+</div><div class="stat-label">Business Topics</div></div>
+          <div><div class="stat-number">Free</div><div class="stat-label">No Credit Card</div></div>
+        </div>
       </div>
-      <div class="ob-divider"><span>OR TYPE YOUR OWN</span></div>
-      <input class="ob-input" id="customBiz" type="text" placeholder="e.g. Solar installation"/>
-      <button class="ob-start" id="saveProfileBtn" disabled>Continue</button>
+      <div class="hero-image">
+        <img src="https://placehold.co/500x400/141d35/00d4ff?text=AI+Chat+Demo" alt="AI Chat Preview">
+      </div>
     </div>
+  </div>
+  <div class="features">
+    <h2 class="section-title">Why <span>My Business AI</span>?</h2>
+    <div class="features-grid">
+      <div class="feature-card"><div class="feature-icon">🤖</div><h3>Expert AI Advice</h3><p>Get actionable insights on growth, finance, marketing, operations, HR, legal, and digital presence.</p></div>
+      <div class="feature-card"><div class="feature-icon">📊</div><h3>Visual Reports</h3><p>Charts and graphs that make complex business data easy to understand and act upon.</p></div>
+      <div class="feature-card"><div class="feature-icon">💬</div><h3>Chat History</h3><p>All your conversations are saved. Access them from any device after signing in.</p></div>
+      <div class="feature-card"><div class="feature-icon">📱</div><h3>Installable PWA</h3><p>Install the app on your phone and use it offline – works like a native app.</p></div>
+      <div class="feature-card"><div class="feature-icon">🔒</div><h3>Privacy First</h3><p>Your conversations are private and secure. We never share your data.</p></div>
+      <div class="feature-card"><div class="feature-icon">🌍</div><h3>Built for Africa</h3><p>Understands local challenges, opportunities, and market conditions.</p></div>
+    </div>
+  </div>
+  <div class="pricing">
+    <h2 class="section-title">Simple, <span>Transparent</span> Pricing</h2>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <h3>Free</h3>
+        <div class="price">₦0<span>/month</span></div>
+        <ul><li>Unlimited chat conversations</li><li>Basic business advice</li><li>Chat history (30 days)</li><li>Email support</li></ul>
+        <button class="btn-pricing freeSignupBtn">Get Started</button>
+      </div>
+      <div class="pricing-card popular">
+        <div class="popular-badge">Pro</div>
+        <h3>Pro</h3>
+        <div class="price">₦2,000<span>/month <span class="coming-soon-badge">Coming Soon</span></span></div>
+        <ul>
+          <li>Export chat as PDF</li>
+          <li>Advanced analytics & charts</li>
+          <li>Custom business plan templates</li>
+          <li>Priority 24h support</li>
+          <li>Unlimited chat history</li>
+          <li>Team sharing (basic)</li>
+        </ul>
+        <button class="btn-pricing" id="proNotifyBtn" style="background:transparent; border:1px solid #00d4ff; color:#00d4ff;">Notify Me</button>
+      </div>
+    </div>
+  </div>
+  <div class="footer">
+    <p>© 2026 TeaJay Konsult Ltd. All rights reserved. | Built with ❤️ by TeaJay Konsult</p>
   </div>
 </div>
 
+<!-- AUTH MODAL -->
+<div id="authModal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal" id="closeModalBtn">&times;</span>
+    <div class="tab">
+      <button id="modalSigninTab" class="active">Sign In</button>
+      <button id="modalSignupTab">Sign Up</button>
+    </div>
+    <form id="modalSigninForm">
+      <div class="form-group"><input type="email" id="modalSigninEmail" placeholder="Email" required></div>
+      <div class="form-group"><input type="password" id="modalSigninPassword" placeholder="Password" required></div>
+      <button type="submit">Sign In</button>
+      <div class="message" id="modalSigninMessage"></div>
+    </form>
+    <form id="modalSignupForm" class="hidden">
+      <div class="form-group"><input type="email" id="modalSignupEmail" placeholder="Email" required></div>
+      <div class="form-group"><input type="password" id="modalSignupPassword" placeholder="Password (min. 6 characters)" required></div>
+      <button type="submit">Create Account</button>
+      <div class="message" id="modalSignupMessage"></div>
+    </form>
+  </div>
+</div>
+
+<!-- DASHBOARD (original content) -->
 <div id="appWrapper" class="app-wrapper" style="display:none;">
   <div class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <h2>My <span>Business AI</span></h2>
-      <p>TeaJay Konsult Ltd.</p>
-    </div>
+    <div class="sidebar-header"><h2>My <span>Business AI</span></h2><p>TeaJay Konsult Ltd.</p></div>
     <div class="conversation-list" id="conversationList"></div>
     <button class="new-chat-btn" id="newChatBtn">+ New Chat</button>
     <button class="sign-out-btn" id="signOutBtn">Sign Out</button>
@@ -341,10 +651,7 @@ footer{text-align:center;padding:14px;font-size:11px;color:var(--sub);border-top
   <div class="main-chat">
     <div class="app-header">
       <button id="menuToggle" class="menu-toggle">☰</button>
-      <div class="header-info">
-        <div class="hi-name">My Business AI</div>
-        <div class="hi-biz" id="headerBiz">Loading...</div>
-      </div>
+      <div class="header-info"><div class="hi-name">My Business AI</div><div class="hi-biz" id="headerBiz">Loading...</div></div>
       <div class="header-actions">
         <button class="hdr-btn" id="exportChatBtn">📋 Export</button>
         <button class="pro-btn" id="exportPdfBtn">📄 Export as PDF</button>
@@ -362,19 +669,11 @@ footer{text-align:center;padding:14px;font-size:11px;color:var(--sub);border-top
       <div class="topic-pill" data-topic="Digital & Online Presence">🌐 Digital</div>
     </div>
     <div class="chat-area" id="chatArea">
-      <div class="welcome-msg" id="welcomeMsg">
-        <div class="wm-icon">🧠</div>
-        <h3 id="welcomeTitle">Ready to Consult</h3>
-        <p id="welcomeText">Ask me anything about your business. I am here to give you expert, practical advice.</p>
-        <div class="quick-suggestions" id="quickSuggestions"></div>
-      </div>
+      <div class="welcome-msg" id="welcomeMsg"><div class="wm-icon">🧠</div><h3 id="welcomeTitle">Ready to Consult</h3><p id="welcomeText">Ask me anything about your business...</p><div class="quick-suggestions" id="quickSuggestions"></div></div>
       <div class="messages" id="messages"></div>
     </div>
     <div class="input-area">
-      <div class="input-wrap">
-        <textarea class="msg-input" id="msgInput" placeholder="Ask your business question..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
-        <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
-      </div>
+      <div class="input-wrap"><textarea class="msg-input" id="msgInput" placeholder="Ask your business question..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea><button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button></div>
       <div class="input-hint">Powered by AI · TeaJay Konsult Ltd.</div>
     </div>
     <div class="share-row">
@@ -386,11 +685,14 @@ footer{text-align:center;padding:14px;font-size:11px;color:var(--sub);border-top
   </div>
 </div>
 
+<!-- Upgrade modal (Pro features coming soon) -->
 <div id="upgradeModal" class="modal">
   <div class="modal-content">
     <h3>🚀 Pro Feature – Coming Soon</h3>
-    <p>This feature will be available in the Pro plan. Stay tuned for updates!</p>
-    <button onclick="document.getElementById('upgradeModal').style.display='none'">Close</button>
+    <p>This feature is part of the Pro plan, which is not yet available. Leave your email and we'll notify you when it launches!</p>
+    <input type="email" id="notifyEmail" placeholder="Your email address" style="width:100%; padding:12px; margin:16px 0; border-radius:40px; border:1px solid var(--cyan-border); background:#141d35; color:#fff;">
+    <button id="notifySubmitBtn" style="background:linear-gradient(135deg,#0099bb,#00d4ff); border:none; padding:10px 24px; border-radius:40px; font-weight:700; cursor:pointer; width:100%;">Notify Me</button>
+    <button onclick="document.getElementById('upgradeModal').style.display='none'" style="margin-top:12px; background:transparent; border:1px solid var(--cyan-border); padding:8px 20px; border-radius:40px; cursor:pointer; width:100%;">Cancel</button>
   </div>
 </div>
 
@@ -407,10 +709,17 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 firebase.analytics();
-
 const auth = firebase.auth();
 const db = firebase.firestore();
 
+// DOM elements for landing/page toggle
+const landingPage = document.getElementById('landingPage');
+const appWrapper = document.getElementById('appWrapper');
+const upgradeModal = document.getElementById('upgradeModal');
+const exportPdfBtn = document.getElementById('exportPdfBtn');
+const businessPlanBtn = document.getElementById('businessPlanBtn');
+
+// Global dashboard variables
 let currentUser = null;
 let userProfile = { name: '', bizName: '', bizType: '' };
 let currentTopic = 'General Business';
@@ -423,7 +732,6 @@ let currentChart = null;
 
 const FUNCTION_URL = '/api/call-groq';
 const APP_URL = 'https://my-business-ai.vercel.app';
-
 const TOPIC_SUGGESTIONS = {
   'General Business': ['How do I grow my business?', 'What are my biggest risks?', 'How do I attract more customers?', 'Give me a business health check'],
   'Growth Strategy': ['How can I scale my business?', 'Should I expand to a new location?', 'How do I enter a new market?', 'What growth strategies suit my business?'],
@@ -435,6 +743,7 @@ const TOPIC_SUGGESTIONS = {
   'Digital & Online Presence': ['How do I build a website?', 'How do I sell online?', 'How do I use social media for business?', 'How do I run online ads on a small budget?']
 };
 
+// Helper to show success animation
 function showSuccessAnimation() {
   return new Promise((resolve) => {
     const overlay = document.getElementById('successOverlay');
@@ -446,6 +755,7 @@ function showSuccessAnimation() {
   });
 }
 
+// ========== ORIGINAL AUTH UI (for profile setup) ==========
 document.querySelectorAll('.auth-tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     const type = btn.getAttribute('data-auth');
@@ -455,7 +765,7 @@ document.querySelectorAll('.auth-tab-btn').forEach(btn => {
     document.getElementById('signupForm').classList.toggle('active', type === 'signup');
   });
 });
-document.getElementById('signinBtn').addEventListener('click', async () => {
+document.getElementById('signinBtn')?.addEventListener('click', async () => {
   const email = document.getElementById('signinEmail').value.trim();
   const password = document.getElementById('signinPassword').value;
   try {
@@ -466,7 +776,7 @@ document.getElementById('signinBtn').addEventListener('click', async () => {
     document.getElementById('authMessage').innerText = err.message;
   }
 });
-document.getElementById('signupBtn').addEventListener('click', async () => {
+document.getElementById('signupBtn')?.addEventListener('click', async () => {
   const email = document.getElementById('signupEmail').value.trim();
   const password = document.getElementById('signupPassword').value;
   try {
@@ -566,10 +876,7 @@ function renderConversationList() {
                      <div class="conversation-date">${conv.updatedAt.toLocaleDateString()}</div>`;
     div.onclick = () => {
       switchConversation(conv.id);
-      // Auto-close sidebar on mobile after selecting a conversation
-      if (window.innerWidth <= 768) {
-        document.getElementById('sidebar').classList.remove('open');
-      }
+      if (window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('open');
     };
     container.appendChild(div);
   });
@@ -603,7 +910,7 @@ async function switchConversation(convId) {
 async function createNewConversation() {
   if (isLoading) return;
   const convRef = db.collection('users').doc(currentUser.uid).collection('conversations').doc();
-  const title = 'New Chat';  // changed from timestamp to generic "New Chat"
+  const title = 'New Chat';
   await convRef.set({
     title: title,
     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -616,10 +923,7 @@ async function createNewConversation() {
   chatHistory = [];
   document.getElementById('messages').innerHTML = '';
   document.getElementById('welcomeMsg').style.display = 'block';
-  // Auto-close sidebar on mobile after creating new chat
-  if (window.innerWidth <= 768) {
-    document.getElementById('sidebar').classList.remove('open');
-  }
+  if (window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('open');
 }
 async function addMessageToConversation(role, text) {
   if (!currentConversationId) return;
@@ -628,13 +932,10 @@ async function addMessageToConversation(role, text) {
     messages: firebase.firestore.FieldValue.arrayUnion({ role, text, timestamp: new Date().toISOString() }),
     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
   });
-  // Update title from first user message if still "New Chat"
   const doc = await convRef.get();
-  const currentTitle = doc.data().title;
-  if (currentTitle === 'New Chat' && role === 'user') {
+  if (doc.data().title === 'New Chat' && role === 'user') {
     const newTitle = text.slice(0, 30) + (text.length > 30 ? '…' : '');
     await convRef.update({ title: newTitle });
-    // Refresh conversation list to show new title
     loadConversations();
   }
 }
@@ -860,16 +1161,9 @@ document.getElementById('exportChatBtn').addEventListener('click', exportChat);
 document.querySelectorAll('.topic-pill').forEach(pill => {
   pill.addEventListener('click', () => setTopic(pill, pill.getAttribute('data-topic')));
 });
-document.getElementById('exportPdfBtn').addEventListener('click', () => {
-  document.getElementById('upgradeModal').style.display = 'flex';
-});
-document.getElementById('businessPlanBtn').addEventListener('click', () => {
-  document.getElementById('upgradeModal').style.display = 'flex';
-});
 document.getElementById('menuToggle')?.addEventListener('click', () => {
   document.getElementById('sidebar').classList.toggle('open');
 });
-// Close sidebar when clicking outside on mobile
 document.addEventListener('click', (e) => {
   const sidebar = document.getElementById('sidebar');
   const menuToggle = document.getElementById('menuToggle');
@@ -877,18 +1171,114 @@ document.addEventListener('click', (e) => {
     sidebar.classList.remove('open');
   }
 });
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  const fab = document.getElementById('installBtn');
-  fab.style.display = 'flex';
-  fab.onclick = async () => { e.prompt(); const { outcome } = await e.userChoice; if (outcome === 'accepted') fab.style.display = 'none'; };
+
+// ========== PRO FEATURES: locked (show upgrade modal) ==========
+function showUpgradeModal() {
+  upgradeModal.style.display = 'flex';
+}
+if (exportPdfBtn) exportPdfBtn.onclick = showUpgradeModal;
+if (businessPlanBtn) businessPlanBtn.onclick = showUpgradeModal;
+
+// Notify button in upgrade modal
+document.getElementById('notifySubmitBtn')?.addEventListener('click', () => {
+  const email = document.getElementById('notifyEmail').value.trim();
+  if (!email) {
+    alert('Please enter your email address.');
+    return;
+  }
+  // In a real implementation, you would save this email to Firestore or a mailing list.
+  // For now, just close modal and show a thank you.
+  upgradeModal.style.display = 'none';
+  showToast('Thank you! We will notify you when Pro is available.');
+  document.getElementById('notifyEmail').value = '';
 });
-const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-if (isIOS && !isStandalone) document.getElementById('iosBanner').style.display = 'block';
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
+document.getElementById('proNotifyBtn')?.addEventListener('click', showUpgradeModal);
+
+// ========== Auth modal logic ==========
+const authModal = document.getElementById('authModal');
+const signinTab = document.getElementById('modalSigninTab');
+const signupTab = document.getElementById('modalSignupTab');
+const signinFormModal = document.getElementById('modalSigninForm');
+const signupFormModal = document.getElementById('modalSignupForm');
+const signinEmail = document.getElementById('modalSigninEmail');
+const signinPassword = document.getElementById('modalSigninPassword');
+const signupEmail = document.getElementById('modalSignupEmail');
+const signupPassword = document.getElementById('modalSignupPassword');
+const signinMessage = document.getElementById('modalSigninMessage');
+const signupMessage = document.getElementById('modalSignupMessage');
+
+function openModal(showSignIn = true) {
+  authModal.style.display = 'flex';
+  if (showSignIn) {
+    signinTab.classList.add('active');
+    signupTab.classList.remove('active');
+    signinFormModal.classList.remove('hidden');
+    signupFormModal.classList.add('hidden');
+  } else {
+    signupTab.classList.add('active');
+    signinTab.classList.remove('active');
+    signupFormModal.classList.remove('hidden');
+    signinFormModal.classList.add('hidden');
+  }
+}
+document.getElementById('landingSigninBtn')?.addEventListener('click', () => openModal(true));
+document.getElementById('landingSignupBtn')?.addEventListener('click', () => openModal(false));
+document.getElementById('heroSigninBtn')?.addEventListener('click', () => openModal(true));
+document.getElementById('heroSignupBtn')?.addEventListener('click', () => openModal(false));
+document.querySelectorAll('.freeSignupBtn').forEach(btn => btn.addEventListener('click', () => openModal(false)));
+document.getElementById('closeModalBtn')?.addEventListener('click', () => authModal.style.display = 'none');
+window.addEventListener('click', (e) => { if (e.target === authModal) authModal.style.display = 'none'; });
+
+signinTab.addEventListener('click', () => {
+  signinTab.classList.add('active');
+  signupTab.classList.remove('active');
+  signinFormModal.classList.remove('hidden');
+  signupFormModal.classList.add('hidden');
+});
+signupTab.addEventListener('click', () => {
+  signupTab.classList.add('active');
+  signinTab.classList.remove('active');
+  signupFormModal.classList.remove('hidden');
+  signinFormModal.classList.add('hidden');
+});
+
+signinFormModal.onsubmit = async (e) => {
+  e.preventDefault();
+  signinMessage.textContent = '';
+  const email = signinEmail.value.trim();
+  const password = signinPassword.value;
+  try {
+    await auth.signInWithEmailAndPassword(email, password);
+    authModal.style.display = 'none';
+  } catch (err) {
+    signinMessage.textContent = err.message;
+    signinMessage.classList.add('error');
+  }
+};
+signupFormModal.onsubmit = async (e) => {
+  e.preventDefault();
+  signupMessage.textContent = '';
+  const email = signupEmail.value.trim();
+  const password = signupPassword.value;
+  if (password.length < 6) {
+    signupMessage.textContent = 'Password must be at least 6 characters.';
+    signupMessage.classList.add('error');
+    return;
+  }
+  try {
+    await auth.createUserWithEmailAndPassword(email, password);
+    authModal.style.display = 'none';
+  } catch (err) {
+    signupMessage.textContent = err.message;
+    signupMessage.classList.add('error');
+  }
+};
+
+// Auth state listener
 auth.onAuthStateChanged(user => {
   if (user) {
+    landingPage.style.display = 'none';
+    appWrapper.style.display = 'flex';
     currentUser = user;
     db.collection('users').doc(user.uid).get().then(doc => {
       if (doc.exists && doc.data().name) {
@@ -900,10 +1290,22 @@ auth.onAuthStateChanged(user => {
       }
     });
   } else {
-    document.getElementById('authContainer').style.display = 'flex';
-    document.getElementById('appWrapper').style.display = 'none';
+    landingPage.style.display = 'flex';
+    appWrapper.style.display = 'none';
   }
 });
+
+// PWA install
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  const fab = document.getElementById('installBtn');
+  if (fab) fab.style.display = 'flex';
+  fab.onclick = async () => { e.prompt(); const { outcome } = await e.userChoice; if (outcome === 'accepted') fab.style.display = 'none'; };
+});
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+if (isIOS && !isStandalone) document.getElementById('iosBanner').style.display = 'block';
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
 </script>
 </body>
 </html>
