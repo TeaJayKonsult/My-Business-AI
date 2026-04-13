@@ -16,6 +16,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
 <style>
+/* (your existing CSS – unchanged) */
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 :root{
 --bg:#0a0e1a;
@@ -41,11 +42,9 @@ h1,h2,h3,h4{font-family:'Syne',sans-serif}
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-thumb{background:var(--cyan-dark);border-radius:4px}
 
-/* GLASSMORPHIC EFFECTS */
 .glass{background:rgba(15,22,40,0.7);backdrop-filter:blur(10px);border:1px solid var(--cyan-border);}
 .transition-all{transition:all 0.2s ease;}
 
-/* AUTH PANEL */
 .auth-container{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;}
 .auth-card{background:var(--surface);border:1px solid var(--cyan-border);border-radius:28px;padding:40px 32px;width:100%;max-width:480px;z-index:1;box-shadow:0 20px 60px rgba(0,0,0,0.5);animation:fadeInUp 0.5s ease;}
 .auth-card::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);}
@@ -69,7 +68,6 @@ h1,h2,h3,h4{font-family:'Syne',sans-serif}
 .ob-divider::before,.ob-divider::after{content:'';flex:1;height:1px;background:var(--border);}
 .ob-divider span{font-size:11px;color:var(--sub);}
 
-/* SUCCESS ANIMATION OVERLAY */
 .success-overlay {
   position: fixed;
   top: 0;
@@ -105,7 +103,6 @@ h1,h2,h3,h4{font-family:'Syne',sans-serif}
   25% { transform: rotate(15deg); }
   75% { transform: rotate(-15deg); }
 }
-/* MAIN APP LAYOUT */
 .app-wrapper{display:flex;height:100vh;background:var(--bg);}
 .sidebar{width:var(--sidebar-width);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;transition:all 0.3s;z-index:10;}
 .sidebar-header{padding:20px;border-bottom:1px solid var(--border);}
@@ -123,7 +120,6 @@ h1,h2,h3,h4{font-family:'Syne',sans-serif}
 .sign-out-btn{background:transparent;border:1px solid var(--border);border-radius:12px;padding:10px;margin:16px;color:var(--sub);cursor:pointer;transition:all 0.2s;}
 .sign-out-btn:hover{border-color:var(--red);color:var(--red);}
 
-/* MAIN CHAT AREA */
 .main-chat{flex:1;display:flex;flex-direction:column;overflow:hidden;}
 .app-header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
 .menu-toggle{background:none;border:none;color:var(--cyan);font-size:24px;cursor:pointer;display:none;}
@@ -133,6 +129,21 @@ h1,h2,h3,h4{font-family:'Syne',sans-serif}
 .header-actions{display:flex;gap:8px;}
 .hdr-btn{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:12px;font-weight:600;color:var(--sub);cursor:pointer;transition:all .2s;}
 .hdr-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+.pro-btn {
+  background: var(--card);
+  border: 1px solid var(--cyan-border);
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--cyan);
+  cursor: pointer;
+  transition: all .2s;
+}
+.pro-btn:hover {
+  border-color: var(--cyan);
+  background: var(--cyan-soft);
+}
 .categories-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;gap:8px;overflow-x:auto;flex-shrink:0;}
 .topic-pill{padding:7px 14px;background:var(--card);border:1.5px solid var(--border);border-radius:50px;font-size:12px;font-weight:600;color:var(--sub);cursor:pointer;white-space:nowrap;transition:all .2s;}
 .topic-pill.active{background:var(--cyan-soft);border-color:var(--cyan);color:var(--cyan);}
@@ -154,7 +165,6 @@ h1,h2,h3,h4{font-family:'Syne',sans-serif}
 .msg-bubble.bot{background:var(--card);border:1px solid var(--border);border-radius:4px 18px 18px 18px;}
 .msg-bubble.user{background:linear-gradient(135deg,var(--cyan-dark),var(--cyan));color:#000;border-radius:18px 4px 18px 18px;}
 .msg-bubble.bot strong{color:var(--cyan);}
-/* For messages containing charts */
 .msg-bubble.has-chart {
   max-width: 90%;
   width: auto;
@@ -200,6 +210,45 @@ footer{text-align:center;padding:14px;font-size:11px;color:var(--sub);border-top
 .fab{position:fixed;bottom:90px;right:20px;background:linear-gradient(135deg,var(--cyan-dark),var(--cyan));color:#000;border:none;border-radius:50px;padding:12px 18px;font-size:13px;font-weight:700;cursor:pointer;display:none;align-items:center;gap:8px;}
 .ios-banner{display:none;background:var(--surface);border:1px solid var(--cyan-border);border-radius:16px;padding:14px 40px 14px 16px;position:fixed;bottom:20px;left:14px;right:14px;z-index:998;}
 
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(5px);
+  z-index: 2000;
+  justify-content: center;
+  align-items: center;
+}
+.modal-content {
+  background: var(--surface);
+  border: 1px solid var(--cyan-border);
+  border-radius: 24px;
+  padding: 32px;
+  max-width: 400px;
+  text-align: center;
+}
+.modal-content h3 {
+  color: var(--cyan);
+  margin-bottom: 16px;
+}
+.modal-content p {
+  margin-bottom: 24px;
+  color: var(--sub);
+}
+.modal-content button {
+  background: linear-gradient(135deg, var(--cyan-dark), var(--cyan));
+  border: none;
+  padding: 10px 24px;
+  border-radius: 40px;
+  font-weight: 700;
+  cursor: pointer;
+  color: #000;
+}
+
 @keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes msgSlide{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
@@ -221,13 +270,11 @@ footer{text-align:center;padding:14px;font-size:11px;color:var(--sub);border-top
   <p>📲 <strong>Install My Business AI:</strong> Tap <strong>Share</strong> in Safari then <strong>"Add to Home Screen"</strong></p>
 </div>
 
-<!-- SUCCESS ANIMATION OVERLAY -->
 <div id="successOverlay" class="success-overlay">
   <div class="success-emoji" id="successEmoji">😊</div>
   <div class="clap-emoji" id="clapEmoji">👏</div>
 </div>
 
-<!-- AUTH CONTAINER -->
 <div id="authContainer" class="auth-container">
   <div class="auth-card">
     <div class="ob-logo" style="text-align:center;margin-bottom:32px;">
@@ -281,16 +328,13 @@ footer{text-align:center;padding:14px;font-size:11px;color:var(--sub);border-top
   </div>
 </div>
 
-<!-- MAIN APP (hidden until auth) -->
 <div id="appWrapper" class="app-wrapper" style="display:none;">
   <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <h2>My <span>Business AI</span></h2>
       <p>TeaJay Konsult Ltd.</p>
     </div>
-    <div class="conversation-list" id="conversationList">
-      <!-- conversations will appear here -->
-    </div>
+    <div class="conversation-list" id="conversationList"></div>
     <button class="new-chat-btn" id="newChatBtn">+ New Chat</button>
     <button class="sign-out-btn" id="signOutBtn">Sign Out</button>
   </div>
@@ -303,6 +347,8 @@ footer{text-align:center;padding:14px;font-size:11px;color:var(--sub);border-top
       </div>
       <div class="header-actions">
         <button class="hdr-btn" id="exportChatBtn">📋 Export</button>
+        <button class="pro-btn" id="exportPdfBtn">📄 Export as PDF</button>
+        <button class="pro-btn" id="businessPlanBtn">📝 Business Plan</button>
       </div>
     </div>
     <div class="categories-bar" id="categoriesBar">
@@ -340,6 +386,14 @@ footer{text-align:center;padding:14px;font-size:11px;color:var(--sub);border-top
   </div>
 </div>
 
+<div id="upgradeModal" class="modal">
+  <div class="modal-content">
+    <h3>🚀 Pro Feature – Coming Soon</h3>
+    <p>This feature will be available in the Pro plan. Stay tuned for updates!</p>
+    <button onclick="document.getElementById('upgradeModal').style.display='none'">Close</button>
+  </div>
+</div>
+
 <script>
 // Firebase Config
 const firebaseConfig = {
@@ -352,13 +406,11 @@ const firebaseConfig = {
   measurementId: "G-YSGPJ4LCBG"
 };
 firebase.initializeApp(firebaseConfig);
-// Enable Analytics
 firebase.analytics();
 
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// Global state
 let currentUser = null;
 let userProfile = { name: '', bizName: '', bizType: '' };
 let currentTopic = 'General Business';
@@ -383,7 +435,6 @@ const TOPIC_SUGGESTIONS = {
   'Digital & Online Presence': ['How do I build a website?', 'How do I sell online?', 'How do I use social media for business?', 'How do I run online ads on a small budget?']
 };
 
-// Helper to show success animation
 function showSuccessAnimation() {
   return new Promise((resolve) => {
     const overlay = document.getElementById('successOverlay');
@@ -395,7 +446,6 @@ function showSuccessAnimation() {
   });
 }
 
-// ----- Auth UI -----
 document.querySelectorAll('.auth-tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     const type = btn.getAttribute('data-auth');
@@ -514,7 +564,13 @@ function renderConversationList() {
     div.className = 'conversation-item' + (currentConversationId === conv.id ? ' active' : '');
     div.innerHTML = `<div class="conversation-title">${escapeHtml(conv.title)}</div>
                      <div class="conversation-date">${conv.updatedAt.toLocaleDateString()}</div>`;
-    div.onclick = () => switchConversation(conv.id);
+    div.onclick = () => {
+      switchConversation(conv.id);
+      // Auto-close sidebar on mobile after selecting a conversation
+      if (window.innerWidth <= 768) {
+        document.getElementById('sidebar').classList.remove('open');
+      }
+    };
     container.appendChild(div);
   });
 }
@@ -528,7 +584,6 @@ async function switchConversation(convId) {
     } else {
       chatHistory = [];
     }
-    // Render messages
     const messagesDiv = document.getElementById('messages');
     messagesDiv.innerHTML = '';
     for (const msg of chatHistory) {
@@ -548,7 +603,7 @@ async function switchConversation(convId) {
 async function createNewConversation() {
   if (isLoading) return;
   const convRef = db.collection('users').doc(currentUser.uid).collection('conversations').doc();
-  const title = `Chat ${new Date().toLocaleString()}`;
+  const title = 'New Chat';  // changed from timestamp to generic "New Chat"
   await convRef.set({
     title: title,
     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -561,6 +616,10 @@ async function createNewConversation() {
   chatHistory = [];
   document.getElementById('messages').innerHTML = '';
   document.getElementById('welcomeMsg').style.display = 'block';
+  // Auto-close sidebar on mobile after creating new chat
+  if (window.innerWidth <= 768) {
+    document.getElementById('sidebar').classList.remove('open');
+  }
 }
 async function addMessageToConversation(role, text) {
   if (!currentConversationId) return;
@@ -569,12 +628,13 @@ async function addMessageToConversation(role, text) {
     messages: firebase.firestore.FieldValue.arrayUnion({ role, text, timestamp: new Date().toISOString() }),
     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
   });
-  // Update title from first user message if still default
+  // Update title from first user message if still "New Chat"
   const doc = await convRef.get();
-  if (doc.data().title === `Chat ${new Date().toLocaleString()}` && role === 'user') {
+  const currentTitle = doc.data().title;
+  if (currentTitle === 'New Chat' && role === 'user') {
     const newTitle = text.slice(0, 30) + (text.length > 30 ? '…' : '');
     await convRef.update({ title: newTitle });
-    // Refresh conversation list
+    // Refresh conversation list to show new title
     loadConversations();
   }
 }
@@ -589,7 +649,6 @@ function appendMsgToDOM(text, role) {
   avatar.textContent = role === 'bot' ? '🧠' : initials;
   const bubble = document.createElement('div');
   bubble.className = `msg-bubble ${role}`;
-  // Check for chart data
   let chartHtml = '';
   let displayText = text;
   if (role === 'bot') {
@@ -801,11 +860,23 @@ document.getElementById('exportChatBtn').addEventListener('click', exportChat);
 document.querySelectorAll('.topic-pill').forEach(pill => {
   pill.addEventListener('click', () => setTopic(pill, pill.getAttribute('data-topic')));
 });
-// Menu toggle
+document.getElementById('exportPdfBtn').addEventListener('click', () => {
+  document.getElementById('upgradeModal').style.display = 'flex';
+});
+document.getElementById('businessPlanBtn').addEventListener('click', () => {
+  document.getElementById('upgradeModal').style.display = 'flex';
+});
 document.getElementById('menuToggle')?.addEventListener('click', () => {
   document.getElementById('sidebar').classList.toggle('open');
 });
-// PWA install
+// Close sidebar when clicking outside on mobile
+document.addEventListener('click', (e) => {
+  const sidebar = document.getElementById('sidebar');
+  const menuToggle = document.getElementById('menuToggle');
+  if (window.innerWidth <= 768 && sidebar.classList.contains('open') && !sidebar.contains(e.target) && e.target !== menuToggle) {
+    sidebar.classList.remove('open');
+  }
+});
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
   const fab = document.getElementById('installBtn');
