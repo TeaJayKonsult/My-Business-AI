@@ -367,7 +367,7 @@ h1,h2,h3,h4{font-family:'Syne',sans-serif}
   display: none;
 }
 
-/* Dashboard styles */
+/* Dashboard styles (original) */
 .auth-container{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;}
 .auth-card{background:var(--surface);border:1px solid var(--cyan-border);border-radius:28px;padding:40px 32px;width:100%;max-width:480px;z-index:1;box-shadow:0 20px 60px rgba(0,0,0,0.5);animation:fadeInUp 0.5s ease;}
 .auth-card::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);}
@@ -528,7 +528,7 @@ footer{text-align:center;padding:14px;font-size:11px;color:var(--sub);border-top
 </head>
 <body>
 
-<!-- LANDING PAGE (shown when not logged in) -->
+<!-- LANDING PAGE -->
 <div id="landingPage" class="landing">
   <div class="landing-header">
     <div class="logo">
@@ -536,8 +536,8 @@ footer{text-align:center;padding:14px;font-size:11px;color:var(--sub);border-top
       <p>by TeaJay Konsult</p>
     </div>
     <div class="nav-buttons">
-      <button class="btn-outline" id="landingSigninBtn">Sign In</button>
-      <button class="btn-primary" id="landingSignupBtn">Sign Up</button>
+      <button class="btn-outline" id="landingSigninBtn" onclick="openModal(true)">Sign In</button>
+      <button class="btn-primary" id="landingSignupBtn" onclick="openModal(false)">Sign Up</button>
     </div>
   </div>
   <div class="hero">
@@ -546,8 +546,8 @@ footer{text-align:center;padding:14px;font-size:11px;color:var(--sub);border-top
         <h1>AI Business Consultant<br>for <span>African Entrepreneurs</span></h1>
         <p>Get expert advice on growth, finance, marketing, and more. Tailored for the African business environment. Free tier available.</p>
         <div class="cta-buttons" style="display: flex; gap: 16px; flex-wrap: wrap;">
-          <button class="btn-primary" id="heroSignupBtn">Start Free →</button>
-          <button class="btn-outline" id="heroSigninBtn">Sign In</button>
+          <button class="btn-primary" id="heroSignupBtn" onclick="openModal(false)">Start Free →</button>
+          <button class="btn-outline" id="heroSigninBtn" onclick="openModal(true)">Sign In</button>
         </div>
         <div class="hero-stats">
           <div><div class="stat-number">24/7</div><div class="stat-label">Always Available</div></div>
@@ -578,7 +578,7 @@ footer{text-align:center;padding:14px;font-size:11px;color:var(--sub);border-top
         <h3>Free</h3>
         <div class="price">₦0<span>/month</span></div>
         <ul><li>Unlimited chat conversations</li><li>Basic business advice</li><li>Chat history (30 days)</li><li>Email support</li></ul>
-        <button class="btn-pricing freeSignupBtn">Get Started</button>
+        <button class="btn-pricing freeSignupBtn" onclick="openModal(false)">Get Started</button>
       </div>
       <div class="pricing-card popular">
         <div class="popular-badge">Pro</div>
@@ -662,9 +662,8 @@ footer{text-align:center;padding:14px;font-size:11px;color:var(--sub);border-top
 
 <script>
 // Supabase configuration
-const SUPABASE_URL = 'https://wyccjkniwihxktjnchoh.supabase.co'; // e.g., https://wyccjkniwihxktjnchoh.supabase.co
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5Y2Nqa25pd2loeGt0am5jaG9oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNzMzNTgsImV4cCI6MjA5MTc0OTM1OH0.NZYOo_hKRz8txmClfLJgwnVRYB1goS_PooMvqW5G0Pg
-';
+const SUPABASE_URL = 'https://wyccjkniwihxktjnchoh.supabase.co'; // REPLACE WITH YOUR URL
+const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY_HERE'; // REPLACE WITH YOUR ANON KEY (starts eyJ)
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // DOM elements
@@ -727,7 +726,6 @@ function escapeHtml(str) {
 function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; }
 function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
 
-// Format text (basic markdown to HTML)
 function formatText(text) {
   return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
@@ -741,7 +739,6 @@ function formatText(text) {
     .replace(/\n/g, '<br/>');
 }
 
-// Append message to DOM
 function appendMsgToDOM(text, role) {
   const time = new Date().toLocaleTimeString();
   const initials = userProfile.name ? userProfile.name.charAt(0).toUpperCase() : 'U';
@@ -753,7 +750,6 @@ function appendMsgToDOM(text, role) {
   const bubble = document.createElement('div');
   bubble.className = `msg-bubble ${role}`;
   if (role === 'bot') {
-    // Check for chart data
     let chartHtml = '';
     let displayText = text;
     const chartMatch = text.match(/```chart\n([\s\S]*?)\n```/);
@@ -806,8 +802,6 @@ function appendMsg(text, role, save = true) {
   appendMsgToDOM(text, role);
   if (save && currentConversationId) {
     chatHistory.push({ role, text });
-    // In Supabase, messages are saved by the backend after Groq call.
-    // The frontend only adds to local chatHistory for immediate display.
   }
 }
 
@@ -827,7 +821,6 @@ function appendTyping() {
   return wrap;
 }
 
-// System prompt
 function buildSystemPrompt() {
   return `You are an expert business consultant AI assistant built by TeaJay Konsult Ltd. You are currently consulting for:
 
@@ -857,7 +850,6 @@ Additionally, if you are asked to compare data or show trends, you may return a 
 This will be rendered as a bar chart. Use this only when it adds clear value.`;
 }
 
-// Send message
 async function sendMessage() {
   const msg = msgInput.value.trim();
   if (!msg || isLoading || !currentConversationId) return;
@@ -893,12 +885,10 @@ async function sendMessage() {
     const reply = data.output || data.reply || data.text;
     if (reply) {
       appendMsg(reply, 'bot', true);
-      // Update local history (the backend already saved messages, but we need to update chatHistory for future context)
       chatHistory.push({ role: 'assistant', text: reply });
     } else {
       appendMsg('I encountered an issue. Please try again.', 'bot', true);
     }
-    // Refresh conversation list to update updated_at and title
     await loadConversations();
   } catch (err) {
     typing.remove();
@@ -909,7 +899,6 @@ async function sendMessage() {
   sendBtn.disabled = false;
 }
 
-// Load conversations from Supabase
 async function loadConversations() {
   if (!currentUser) return;
   const { data, error } = await supabase
@@ -953,7 +942,6 @@ function renderConversationList() {
 async function switchConversation(convId) {
   if (isLoading) return;
   currentConversationId = convId;
-  // Load messages for this conversation
   const { data, error } = await supabase
     .from('messages')
     .select('role, content')
@@ -965,7 +953,6 @@ async function switchConversation(convId) {
     return;
   }
   chatHistory = data.map(msg => ({ role: msg.role, text: msg.content }));
-  // Render messages
   messagesDiv.innerHTML = '';
   for (const msg of chatHistory) {
     appendMsgToDOM(msg.text, msg.role);
@@ -1000,7 +987,6 @@ async function createNewConversation() {
   if (window.innerWidth <= 768) sidebar.classList.remove('open');
 }
 
-// Export chat
 function exportChat() {
   if (chatHistory.length === 0) { showToast('No conversation to export yet.'); return; }
   let text = `My Business AI — Consultation Report\nBusiness: ${userProfile.bizName} (${userProfile.bizType})\nDate: ${new Date().toLocaleDateString()}\n\n`;
@@ -1010,7 +996,6 @@ function exportChat() {
   navigator.clipboard.writeText(text).then(() => showToast('✅ Report copied'));
 }
 
-// Share app
 function shareApp(platform) {
   const msg = encodeURIComponent(`🧠 I just used My Business AI to get expert business advice — completely free! Try it: ${APP_URL}`);
   const urls = {
@@ -1036,6 +1021,7 @@ const signinMessage = document.getElementById('modalSigninMessage');
 const signupMessage = document.getElementById('modalSignupMessage');
 
 function openModal(showSignIn = true) {
+  alert('openModal called'); // temporary alert to confirm the function is triggered
   authModal.style.display = 'flex';
   if (showSignIn) {
     signinTab.classList.add('active');
@@ -1049,11 +1035,9 @@ function openModal(showSignIn = true) {
     signinFormModal.classList.add('hidden');
   }
 }
-document.getElementById('landingSigninBtn')?.addEventListener('click', () => openModal(true));
-document.getElementById('landingSignupBtn')?.addEventListener('click', () => openModal(false));
-document.getElementById('heroSigninBtn')?.addEventListener('click', () => openModal(true));
-document.getElementById('heroSignupBtn')?.addEventListener('click', () => openModal(false));
-document.querySelectorAll('.freeSignupBtn').forEach(btn => btn.addEventListener('click', () => openModal(false)));
+
+// Inline onclick handlers are already added to buttons, so we don't need addEventListener
+// But we still need the close button and tab switching.
 document.getElementById('closeModalBtn')?.addEventListener('click', () => authModal.style.display = 'none');
 window.addEventListener('click', (e) => { if (e.target === authModal) authModal.style.display = 'none'; });
 
@@ -1097,12 +1081,8 @@ signupFormModal.onsubmit = async (e) => {
   try {
     const { error } = await supabase.auth.signUp({ email, password });
     if (error) throw error;
-    // Auto sign-in after sign-up? Supabase sends confirmation email by default.
-    // For simplicity, we'll tell user to confirm email.
     signupMessage.textContent = 'Account created! Please check your email to confirm.';
     signupMessage.classList.remove('error');
-    // Optionally, sign in immediately if email confirmation is disabled in Supabase settings.
-    // We'll assume confirmation is required, so we don't close modal automatically.
   } catch (err) {
     signupMessage.textContent = err.message;
     signupMessage.classList.add('error');
@@ -1120,7 +1100,6 @@ supabase.auth.onAuthStateChange(async (event, session) => {
       .eq('id', currentUser.id)
       .single();
     if (profileError && profileError.code === 'PGRST116') {
-      // Profile doesn't exist, create with default values
       await supabase.from('profiles').insert({
         id: currentUser.id,
         email: currentUser.email,
@@ -1150,7 +1129,6 @@ supabase.auth.onAuthStateChange(async (event, session) => {
   }
 });
 
-// Topic suggestions and rendering
 function setTopic(el, topic) {
   document.querySelectorAll('.topic-pill').forEach(p => p.classList.remove('active'));
   el.classList.add('active');
@@ -1169,7 +1147,6 @@ function useSuggestion(text) {
   sendMessage();
 }
 
-// Event listeners
 sendBtn.addEventListener('click', sendMessage);
 msgInput.addEventListener('keydown', handleKey);
 newChatBtn.addEventListener('click', createNewConversation);
@@ -1185,7 +1162,6 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// PWA install
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
