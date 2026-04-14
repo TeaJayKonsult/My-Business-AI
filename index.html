@@ -928,7 +928,9 @@ async function sendMessage() {
     } else {
       appendMsg('I encountered an issue. Please try again.', 'bot', true);
     }
-    loadConversations();
+    // Refresh only the sidebar (conversation list) and user profile – not the whole chat
+    await refreshConversationList();
+    await loadUserProfile();
   } catch (err) {
     typing.remove();
     appendMsg(`❌ Error: ${err.message}`, 'bot', true);
@@ -957,6 +959,23 @@ async function loadConversations() {
   } else {
     switchConversation(conversations[0].id);
   }
+}
+
+async function refreshConversationList() {
+  if (!currentUser) return;
+  const snapshot = await db.collection('users').doc(currentUser.uid).collection('conversations')
+    .orderBy('updatedAt', 'desc').get();
+  conversations = [];
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    conversations.push({
+      id: doc.id,
+      title: data.title || 'New Chat',
+      updatedAt: data.updatedAt?.toDate() || new Date()
+    });
+  });
+  renderConversationList();
+  // Do NOT switch conversation – keep currentConversationId unchanged
 }
 
 function renderConversationList() {
@@ -1029,6 +1048,19 @@ function shareApp(platform) {
   window.open(urls[platform], '_blank');
 }
 window.shareApp = shareApp;
+
+async function loadUserProfile() {
+  if (!currentUser) return;
+  const doc = await db.collection('users').doc(currentUser.uid).get();
+  if (doc.exists) {
+    userProfile = {
+      name: doc.data().name || '',
+      bizName: doc.data().bizName || '',
+      bizType: doc.data().bizType || ''
+    };
+    headerBiz.textContent = `${userProfile.bizName || 'Your Business'} · ${userProfile.bizType || 'Entrepreneur'}`;
+  }
+}
 
 // Auth modal logic
 const authModal = document.getElementById('authModal');
@@ -1121,29 +1153,13 @@ signupFormModal.onsubmit = async (e) => {
 auth.onAuthStateChanged(async (user) => {
   if (user) {
     currentUser = user;
-    const doc = await db.collection('users').doc(user.uid).get();
-    if (doc.exists) {
-      userProfile = {
-        name: doc.data().name || '',
-        bizName: doc.data().bizName || '',
-        bizType: doc.data().bizType || ''
-      };
-    } else {
-      await db.collection('users').doc(user.uid).set({
-        email: user.email,
-        name: '',
-        bizName: '',
-        bizType: '',
-        createdAt: new Date().toISOString()
-      });
-    }
+    await loadUserProfile();
+    await loadConversations();
     landingPage.style.display = 'none';
     appWrapper.style.display = 'flex';
-    headerBiz.textContent = `${userProfile.bizName || 'Your Business'} · ${userProfile.bizType || 'Entrepreneur'}`;
     document.getElementById('welcomeTitle').textContent = `Hello, ${userProfile.name || 'Entrepreneur'}! 👋`;
     document.getElementById('welcomeText').textContent = `I am ready to consult on your business. Pick a topic above or ask me anything below.`;
     renderSuggestions();
-    loadConversations();
   } else {
     landingPage.style.display = 'flex';
     appWrapper.style.display = 'none';
