@@ -9,11 +9,7 @@
 <link rel="manifest" href="manifest.json"/>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 /* ========== ORIGINAL STYLES (unchanged) ========== */
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -270,16 +266,6 @@ h1,h2,h3,h4{font-family:'Syne',sans-serif}
   opacity: 0.5;
   cursor: not-allowed;
 }
-.coming-soon-badge {
-  display: inline-block;
-  background: rgba(0,212,255,0.15);
-  color: #00d4ff;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 2px 10px;
-  border-radius: 20px;
-  margin-left: 8px;
-}
 .footer {
   background: #0f1628;
   text-align: center;
@@ -381,7 +367,7 @@ h1,h2,h3,h4{font-family:'Syne',sans-serif}
   display: none;
 }
 
-/* Original dashboard styles (identical to your working file) */
+/* Dashboard styles */
 .auth-container{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;}
 .auth-card{background:var(--surface);border:1px solid var(--cyan-border);border-radius:28px;padding:40px 32px;width:100%;max-width:480px;z-index:1;box-shadow:0 20px 60px rgba(0,0,0,0.5);animation:fadeInUp 0.5s ease;}
 .auth-card::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);}
@@ -464,8 +450,6 @@ h1,h2,h3,h4{font-family:'Syne',sans-serif}
 .header-actions{display:flex;gap:8px;}
 .hdr-btn{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:12px;font-weight:600;color:var(--sub);cursor:pointer;transition:all .2s;}
 .hdr-btn:hover{border-color:var(--cyan);color:var(--cyan);}
-.pro-btn{background:var(--card);border:1px solid var(--cyan-border);border-radius:10px;padding:8px 14px;font-size:12px;font-weight:600;color:var(--cyan);cursor:pointer;transition:all .2s;}
-.pro-btn:hover{border-color:var(--cyan);background:var(--cyan-soft);}
 .categories-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;gap:8px;overflow-x:auto;flex-shrink:0;}
 .topic-pill{padding:7px 14px;background:var(--card);border:1.5px solid var(--border);border-radius:50px;font-size:12px;font-weight:600;color:var(--sub);cursor:pointer;white-space:nowrap;transition:all .2s;}
 .topic-pill.active{background:var(--cyan-soft);border-color:var(--cyan);color:var(--cyan);}
@@ -599,16 +583,9 @@ footer{text-align:center;padding:14px;font-size:11px;color:var(--sub);border-top
       <div class="pricing-card popular">
         <div class="popular-badge">Pro</div>
         <h3>Pro</h3>
-        <div class="price">₦2,000<span>/month <span class="coming-soon-badge">Coming Soon</span></span></div>
-        <ul>
-          <li>Export chat as PDF</li>
-          <li>Advanced analytics & charts</li>
-          <li>Custom business plan templates</li>
-          <li>Priority 24h support</li>
-          <li>Unlimited chat history</li>
-          <li>Team sharing (basic)</li>
-        </ul>
-        <button class="btn-pricing" id="proNotifyBtn" style="background:transparent; border:1px solid #00d4ff; color:#00d4ff;">Notify Me</button>
+        <div class="price">₦2,000<span>/month</span></div>
+        <ul><li>Export chat as PDF</li><li>Advanced analytics & charts</li><li>Custom business plan templates</li><li>Priority 24h support</li><li>Unlimited chat history</li><li>Team sharing (basic)</li></ul>
+        <button class="btn-pricing" disabled>Coming Soon</button>
       </div>
     </div>
   </div>
@@ -640,7 +617,7 @@ footer{text-align:center;padding:14px;font-size:11px;color:var(--sub);border-top
   </div>
 </div>
 
-<!-- DASHBOARD (original content) -->
+<!-- DASHBOARD -->
 <div id="appWrapper" class="app-wrapper" style="display:none;">
   <div class="sidebar" id="sidebar">
     <div class="sidebar-header"><h2>My <span>Business AI</span></h2><p>TeaJay Konsult Ltd.</p></div>
@@ -654,8 +631,6 @@ footer{text-align:center;padding:14px;font-size:11px;color:var(--sub);border-top
       <div class="header-info"><div class="hi-name">My Business AI</div><div class="hi-biz" id="headerBiz">Loading...</div></div>
       <div class="header-actions">
         <button class="hdr-btn" id="exportChatBtn">📋 Export</button>
-        <button class="pro-btn" id="exportPdfBtn">📄 Export as PDF</button>
-        <button class="pro-btn" id="businessPlanBtn">📝 Business Plan</button>
       </div>
     </div>
     <div class="categories-bar" id="categoriesBar">
@@ -685,41 +660,30 @@ footer{text-align:center;padding:14px;font-size:11px;color:var(--sub);border-top
   </div>
 </div>
 
-<!-- Upgrade modal (Pro features coming soon) -->
-<div id="upgradeModal" class="modal">
-  <div class="modal-content">
-    <h3>🚀 Pro Feature – Coming Soon</h3>
-    <p>This feature is part of the Pro plan, which is not yet available. Leave your email and we'll notify you when it launches!</p>
-    <input type="email" id="notifyEmail" placeholder="Your email address" style="width:100%; padding:12px; margin:16px 0; border-radius:40px; border:1px solid var(--cyan-border); background:#141d35; color:#fff;">
-    <button id="notifySubmitBtn" style="background:linear-gradient(135deg,#0099bb,#00d4ff); border:none; padding:10px 24px; border-radius:40px; font-weight:700; cursor:pointer; width:100%;">Notify Me</button>
-    <button onclick="document.getElementById('upgradeModal').style.display='none'" style="margin-top:12px; background:transparent; border:1px solid var(--cyan-border); padding:8px 20px; border-radius:40px; cursor:pointer; width:100%;">Cancel</button>
-  </div>
-</div>
-
 <script>
-// Firebase Config
-const firebaseConfig = {
-  apiKey: "AIzaSyBePGaNA1F7bAqyPq8jqPdMmu2ndBsHYZE",
-  authDomain: "teajay-business-ai.firebaseapp.com",
-  projectId: "teajay-business-ai",
-  storageBucket: "teajay-business-ai.firebasestorage.app",
-  messagingSenderId: "432325399013",
-  appId: "1:432325399013:web:d6ae3b95bf2ebe815b9f0c",
-  measurementId: "G-YSGPJ4LCBG"
-};
-firebase.initializeApp(firebaseConfig);
-firebase.analytics();
-const auth = firebase.auth();
-const db = firebase.firestore();
+// Supabase configuration
+const SUPABASE_URL = 'https://wyccjkniwihxktjnchoh.supabase.co'; // e.g., https://wyccjkniwihxktjnchoh.supabase.co
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5Y2Nqa25pd2loeGt0am5jaG9oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNzMzNTgsImV4cCI6MjA5MTc0OTM1OH0.NZYOo_hKRz8txmClfLJgwnVRYB1goS_PooMvqW5G0Pg
+';
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// DOM elements for landing/page toggle
+// DOM elements
 const landingPage = document.getElementById('landingPage');
 const appWrapper = document.getElementById('appWrapper');
-const upgradeModal = document.getElementById('upgradeModal');
-const exportPdfBtn = document.getElementById('exportPdfBtn');
-const businessPlanBtn = document.getElementById('businessPlanBtn');
+const conversationList = document.getElementById('conversationList');
+const messagesDiv = document.getElementById('messages');
+const msgInput = document.getElementById('msgInput');
+const sendBtn = document.getElementById('sendBtn');
+const newChatBtn = document.getElementById('newChatBtn');
+const signOutBtn = document.getElementById('signOutBtn');
+const headerBiz = document.getElementById('headerBiz');
+const welcomeMsgDiv = document.getElementById('welcomeMsg');
+const quickSuggestionsDiv = document.getElementById('quickSuggestions');
+const exportChatBtn = document.getElementById('exportChatBtn');
+const menuToggle = document.getElementById('menuToggle');
+const sidebar = document.getElementById('sidebar');
 
-// Global dashboard variables
+// Global state
 let currentUser = null;
 let userProfile = { name: '', bizName: '', bizType: '' };
 let currentTopic = 'General Business';
@@ -743,204 +707,42 @@ const TOPIC_SUGGESTIONS = {
   'Digital & Online Presence': ['How do I build a website?', 'How do I sell online?', 'How do I use social media for business?', 'How do I run online ads on a small budget?']
 };
 
-// Helper to show success animation
-function showSuccessAnimation() {
-  return new Promise((resolve) => {
-    const overlay = document.getElementById('successOverlay');
-    overlay.style.display = 'flex';
-    setTimeout(() => {
-      overlay.style.display = 'none';
-      resolve();
-    }, 2000);
+// Helper functions
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 3000);
+}
+
+function escapeHtml(str) {
+  return str.replace(/[&<>]/g, function(m) {
+    if (m === '&') return '&amp;';
+    if (m === '<') return '&lt;';
+    if (m === '>') return '&gt;';
+    return m;
   });
 }
 
-// ========== ORIGINAL AUTH UI (for profile setup) ==========
-document.querySelectorAll('.auth-tab-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const type = btn.getAttribute('data-auth');
-    document.querySelectorAll('.auth-tab-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('signinForm').classList.toggle('active', type === 'signin');
-    document.getElementById('signupForm').classList.toggle('active', type === 'signup');
-  });
-});
-document.getElementById('signinBtn')?.addEventListener('click', async () => {
-  const email = document.getElementById('signinEmail').value.trim();
-  const password = document.getElementById('signinPassword').value;
-  try {
-    await auth.signInWithEmailAndPassword(email, password);
-    await showSuccessAnimation();
-    showToast('Signed in');
-  } catch (err) {
-    document.getElementById('authMessage').innerText = err.message;
-  }
-});
-document.getElementById('signupBtn')?.addEventListener('click', async () => {
-  const email = document.getElementById('signupEmail').value.trim();
-  const password = document.getElementById('signupPassword').value;
-  try {
-    await auth.createUserWithEmailAndPassword(email, password);
-    await showSuccessAnimation();
-    showToast('Account created! Set up your profile.');
-    document.getElementById('signinForm').classList.remove('active');
-    document.getElementById('signupForm').classList.remove('active');
-    document.getElementById('profileSetup').style.display = 'block';
-    initProfileForm();
-  } catch (err) {
-    document.getElementById('signupMessage').innerText = err.message;
-  }
-});
+function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; }
+function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
 
-function initProfileForm() {
-  document.querySelectorAll('.cat-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      if (selectedCatEl) selectedCatEl.classList.remove('selected');
-      chip.classList.add('selected');
-      selectedCatEl = chip;
-      document.getElementById('customBiz').value = '';
-      validateProfileForm();
-    });
-  });
-  document.getElementById('customBiz').addEventListener('input', () => {
-    if (selectedCatEl) {
-      selectedCatEl.classList.remove('selected');
-      selectedCatEl = null;
-    }
-    validateProfileForm();
-  });
-  document.getElementById('userName').addEventListener('input', validateProfileForm);
-  document.getElementById('bizName').addEventListener('input', validateProfileForm);
-  document.getElementById('saveProfileBtn').addEventListener('click', saveProfile);
-  validateProfileForm();
+// Format text (basic markdown to HTML)
+function formatText(text) {
+  return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/^### (.*$)/gm, '<h4>$1</h4>')
+    .replace(/^## (.*$)/gm, '<h4>$1</h4>')
+    .replace(/^# (.*$)/gm, '<h4>$1</h4>')
+    .replace(/^\* (.*$)/gm, '<li>$1</li>')
+    .replace(/^\d+\. (.*$)/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
+    .replace(/\n\n/g, '<br/><br/>')
+    .replace(/\n/g, '<br/>');
 }
-function validateProfileForm() {
-  const name = document.getElementById('userName').value.trim();
-  const biz = document.getElementById('bizName').value.trim();
-  const custom = document.getElementById('customBiz').value.trim();
-  const hasType = selectedCatEl ? selectedCatEl.getAttribute('data-cat') : custom;
-  document.getElementById('saveProfileBtn').disabled = !(name && biz && hasType);
-}
-async function saveProfile() {
-  const name = document.getElementById('userName').value.trim();
-  const bizName = document.getElementById('bizName').value.trim();
-  let bizType = selectedCatEl ? selectedCatEl.getAttribute('data-cat') : document.getElementById('customBiz').value.trim();
-  if (!bizType) bizType = '';
-  await db.collection('users').doc(currentUser.uid).set({
-    name, bizName, bizType, email: currentUser.email,
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-  }, { merge: true });
-  userProfile = { name, bizName, bizType };
-  showMainApp();
-}
-function showMainApp() {
-  document.getElementById('authContainer').style.display = 'none';
-  document.getElementById('appWrapper').style.display = 'flex';
-  document.getElementById('headerBiz').textContent = `${userProfile.bizName} · ${userProfile.bizType}`;
-  document.getElementById('welcomeTitle').textContent = `Hello, ${userProfile.name}! 👋`;
-  document.getElementById('welcomeText').textContent = `I am ready to consult on ${userProfile.bizName} — your ${userProfile.bizType} business. Pick a topic above or ask me anything below.`;
-  renderSuggestions();
-  loadConversations();
-}
-async function loadConversations() {
-  try {
-    const snapshot = await db.collection('users').doc(currentUser.uid).collection('conversations')
-      .orderBy('updatedAt', 'desc').get();
-    conversations = [];
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      conversations.push({
-        id: doc.id,
-        title: data.title || 'New Chat',
-        updatedAt: data.updatedAt?.toDate() || new Date()
-      });
-    });
-    renderConversationList();
-    if (conversations.length === 0) {
-      await createNewConversation();
-    } else {
-      switchConversation(conversations[0].id);
-    }
-  } catch (err) {
-    console.error('Failed to load conversations:', err);
-    showToast('Error loading conversations: ' + err.message);
-  }
-}
-function renderConversationList() {
-  const container = document.getElementById('conversationList');
-  container.innerHTML = '';
-  conversations.forEach(conv => {
-    const div = document.createElement('div');
-    div.className = 'conversation-item' + (currentConversationId === conv.id ? ' active' : '');
-    div.innerHTML = `<div class="conversation-title">${escapeHtml(conv.title)}</div>
-                     <div class="conversation-date">${conv.updatedAt.toLocaleDateString()}</div>`;
-    div.onclick = () => {
-      switchConversation(conv.id);
-      if (window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('open');
-    };
-    container.appendChild(div);
-  });
-}
-async function switchConversation(convId) {
-  if (isLoading) return;
-  currentConversationId = convId;
-  try {
-    const doc = await db.collection('users').doc(currentUser.uid).collection('conversations').doc(convId).get();
-    if (doc.exists) {
-      chatHistory = doc.data().messages || [];
-    } else {
-      chatHistory = [];
-    }
-    const messagesDiv = document.getElementById('messages');
-    messagesDiv.innerHTML = '';
-    for (const msg of chatHistory) {
-      appendMsgToDOM(msg.text, msg.role);
-    }
-    if (chatHistory.length === 0) {
-      document.getElementById('welcomeMsg').style.display = 'block';
-    } else {
-      document.getElementById('welcomeMsg').style.display = 'none';
-    }
-    renderConversationList();
-  } catch (err) {
-    console.error('Failed to switch conversation:', err);
-    showToast('Error loading conversation: ' + err.message);
-  }
-}
-async function createNewConversation() {
-  if (isLoading) return;
-  const convRef = db.collection('users').doc(currentUser.uid).collection('conversations').doc();
-  const title = 'New Chat';
-  await convRef.set({
-    title: title,
-    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-    messages: []
-  });
-  conversations.unshift({ id: convRef.id, title, updatedAt: new Date() });
-  renderConversationList();
-  currentConversationId = convRef.id;
-  chatHistory = [];
-  document.getElementById('messages').innerHTML = '';
-  document.getElementById('welcomeMsg').style.display = 'block';
-  if (window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('open');
-}
-async function addMessageToConversation(role, text) {
-  if (!currentConversationId) return;
-  const convRef = db.collection('users').doc(currentUser.uid).collection('conversations').doc(currentConversationId);
-  await convRef.update({
-    messages: firebase.firestore.FieldValue.arrayUnion({ role, text, timestamp: new Date().toISOString() }),
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
-  const doc = await convRef.get();
-  if (doc.data().title === 'New Chat' && role === 'user') {
-    const newTitle = text.slice(0, 30) + (text.length > 30 ? '…' : '');
-    await convRef.update({ title: newTitle });
-    loadConversations();
-  }
-}
+
+// Append message to DOM
 function appendMsgToDOM(text, role) {
-  const msgsDiv = document.getElementById('messages');
   const time = new Date().toLocaleTimeString();
   const initials = userProfile.name ? userProfile.name.charAt(0).toUpperCase() : 'U';
   const wrap = document.createElement('div');
@@ -950,9 +752,10 @@ function appendMsgToDOM(text, role) {
   avatar.textContent = role === 'bot' ? '🧠' : initials;
   const bubble = document.createElement('div');
   bubble.className = `msg-bubble ${role}`;
-  let chartHtml = '';
-  let displayText = text;
   if (role === 'bot') {
+    // Check for chart data
+    let chartHtml = '';
+    let displayText = text;
     const chartMatch = text.match(/```chart\n([\s\S]*?)\n```/);
     if (chartMatch) {
       try {
@@ -978,6 +781,11 @@ function appendMsgToDOM(text, role) {
       } catch(e) { console.warn('Chart parse error', e); }
     }
     bubble.innerHTML = formatText(displayText) + chartHtml;
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'copy-msg-btn';
+    copyBtn.textContent = '📋 Copy';
+    copyBtn.onclick = () => { navigator.clipboard.writeText(text); copyBtn.textContent = '✅ Copied'; setTimeout(() => copyBtn.textContent = '📋 Copy', 2000); };
+    bubble.appendChild(copyBtn);
   } else {
     bubble.innerHTML = escapeHtml(text);
   }
@@ -987,28 +795,23 @@ function appendMsgToDOM(text, role) {
   const inner = document.createElement('div');
   inner.style.maxWidth = '78%';
   inner.appendChild(bubble);
-  if (role === 'bot') {
-    const copyBtn = document.createElement('button');
-    copyBtn.className = 'copy-msg-btn';
-    copyBtn.textContent = '📋 Copy';
-    copyBtn.onclick = () => { navigator.clipboard.writeText(text); copyBtn.textContent = '✅ Copied'; setTimeout(() => copyBtn.textContent = '📋 Copy', 2000); };
-    inner.appendChild(copyBtn);
-  }
   inner.appendChild(timeEl);
   wrap.appendChild(avatar);
   wrap.appendChild(inner);
-  msgsDiv.appendChild(wrap);
-  msgsDiv.scrollTop = msgsDiv.scrollHeight;
+  messagesDiv.appendChild(wrap);
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
+
 function appendMsg(text, role, save = true) {
   appendMsgToDOM(text, role);
   if (save && currentConversationId) {
     chatHistory.push({ role, text });
-    addMessageToConversation(role, text);
+    // In Supabase, messages are saved by the backend after Groq call.
+    // The frontend only adds to local chatHistory for immediate display.
   }
 }
+
 function appendTyping() {
-  const msgsDiv = document.getElementById('messages');
   const wrap = document.createElement('div');
   wrap.className = 'typing-wrap';
   const avatar = document.createElement('div');
@@ -1019,44 +822,12 @@ function appendTyping() {
   bubble.innerHTML = '<div class="td"></div><div class="td"></div><div class="td"></div>';
   wrap.appendChild(avatar);
   wrap.appendChild(bubble);
-  msgsDiv.appendChild(wrap);
-  msgsDiv.scrollTop = msgsDiv.scrollHeight;
+  messagesDiv.appendChild(wrap);
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
   return wrap;
 }
-function formatText(text) {
-  return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-    .replace(/^### (.*$)/gm, '<h4>$1</h4>')
-    .replace(/^## (.*$)/gm, '<h4>$1</h4>')
-    .replace(/^# (.*$)/gm, '<h4>$1</h4>')
-    .replace(/^\* (.*$)/gm, '<li>$1</li>')
-    .replace(/^\d+\. (.*$)/gm, '<li>$1</li>')
-    .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
-    .replace(/\n\n/g, '<br/><br/>')
-    .replace(/\n/g, '<br/>');
-}
-function escapeHtml(text) {
-  return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; }
-function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
-function setTopic(el, topic) {
-  document.querySelectorAll('.topic-pill').forEach(p => p.classList.remove('active'));
-  el.classList.add('active');
-  currentTopic = topic;
-  renderSuggestions();
-}
-function renderSuggestions() {
-  const suggestions = TOPIC_SUGGESTIONS[currentTopic] || TOPIC_SUGGESTIONS['General Business'];
-  document.getElementById('quickSuggestions').innerHTML = suggestions.map(s =>
-    `<button class="suggestion-btn" onclick="useSuggestion('${s.replace(/'/g,"\\'")}')">${s}</button>`
-  ).join('');
-}
-function useSuggestion(text) {
-  document.getElementById('msgInput').value = text;
-  document.getElementById('welcomeMsg').style.display = 'none';
-  sendMessage();
-}
+
+// System prompt
 function buildSystemPrompt() {
   return `You are an expert business consultant AI assistant built by TeaJay Konsult Ltd. You are currently consulting for:
 
@@ -1085,53 +856,151 @@ Additionally, if you are asked to compare data or show trends, you may return a 
 
 This will be rendered as a bar chart. Use this only when it adds clear value.`;
 }
+
+// Send message
 async function sendMessage() {
-  const input = document.getElementById('msgInput');
-  const msg = input.value.trim();
+  const msg = msgInput.value.trim();
   if (!msg || isLoading || !currentConversationId) return;
-  input.value = '';
-  autoResize(input);
+  msgInput.value = '';
+  autoResize(msgInput);
   isLoading = true;
-  document.getElementById('sendBtn').disabled = true;
-  document.getElementById('welcomeMsg').style.display = 'none';
+  sendBtn.disabled = true;
+  welcomeMsgDiv.style.display = 'none';
   appendMsg(msg, 'user', true);
   const typing = appendTyping();
   try {
-    const payload = {
-      prompt: msg,
-      system: buildSystemPrompt(),
-      topic: currentTopic,
-      user: userProfile.name,
-      business: userProfile.bizName,
-      type: userProfile.bizType,
-      history: chatHistory,
-      question: msg
-    };
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token;
+    if (!token) throw new Error('No session token');
     const res = await fetch(FUNCTION_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({
+        prompt: msg,
+        system: buildSystemPrompt(),
+        topic: currentTopic,
+        user: userProfile.name,
+        business: userProfile.bizName,
+        type: userProfile.bizType,
+        history: chatHistory,
+        question: msg,
+        conversationId: currentConversationId
+      })
     });
-    if (!res.ok) {
-      const txt = await res.text();
-      throw new Error(`Server error: ${res.status} ${txt}`);
-    }
     const data = await res.json();
     typing.remove();
-    const reply = (data && (data.output || data.reply || data.text)) ? (data.output || data.reply || data.text) : null;
+    if (!res.ok) throw new Error(data.error || 'Generation failed');
+    const reply = data.output || data.reply || data.text;
     if (reply) {
       appendMsg(reply, 'bot', true);
+      // Update local history (the backend already saved messages, but we need to update chatHistory for future context)
+      chatHistory.push({ role: 'assistant', text: reply });
     } else {
-      appendMsg('I encountered an issue. Please try again or rephrase your question.', 'bot', true);
+      appendMsg('I encountered an issue. Please try again.', 'bot', true);
     }
-  } catch (e) {
+    // Refresh conversation list to update updated_at and title
+    await loadConversations();
+  } catch (err) {
     typing.remove();
-    appendMsg(`❌ **Error:** ${e.message}`, 'bot', true);
-    console.error(e);
+    appendMsg(`❌ Error: ${err.message}`, 'bot', true);
+    console.error(err);
   }
   isLoading = false;
-  document.getElementById('sendBtn').disabled = false;
+  sendBtn.disabled = false;
 }
+
+// Load conversations from Supabase
+async function loadConversations() {
+  if (!currentUser) return;
+  const { data, error } = await supabase
+    .from('conversations')
+    .select('id, title, updated_at')
+    .eq('user_id', currentUser.id)
+    .order('updated_at', { ascending: false });
+  if (error) {
+    console.error('Load conversations error:', error);
+    showToast('Error loading conversations');
+    return;
+  }
+  conversations = data.map(conv => ({
+    id: conv.id,
+    title: conv.title || 'New Chat',
+    updatedAt: new Date(conv.updated_at)
+  }));
+  renderConversationList();
+  if (conversations.length === 0) {
+    await createNewConversation();
+  } else {
+    switchConversation(conversations[0].id);
+  }
+}
+
+function renderConversationList() {
+  conversationList.innerHTML = '';
+  conversations.forEach(conv => {
+    const div = document.createElement('div');
+    div.className = 'conversation-item' + (currentConversationId === conv.id ? ' active' : '');
+    div.innerHTML = `<div class="conversation-title">${escapeHtml(conv.title)}</div>
+                     <div class="conversation-date">${conv.updatedAt.toLocaleDateString()}</div>`;
+    div.onclick = () => {
+      switchConversation(conv.id);
+      if (window.innerWidth <= 768) sidebar.classList.remove('open');
+    };
+    conversationList.appendChild(div);
+  });
+}
+
+async function switchConversation(convId) {
+  if (isLoading) return;
+  currentConversationId = convId;
+  // Load messages for this conversation
+  const { data, error } = await supabase
+    .from('messages')
+    .select('role, content')
+    .eq('conversation_id', convId)
+    .order('created_at', { ascending: true });
+  if (error) {
+    console.error('Load messages error:', error);
+    showToast('Error loading messages');
+    return;
+  }
+  chatHistory = data.map(msg => ({ role: msg.role, text: msg.content }));
+  // Render messages
+  messagesDiv.innerHTML = '';
+  for (const msg of chatHistory) {
+    appendMsgToDOM(msg.text, msg.role);
+  }
+  welcomeMsgDiv.style.display = chatHistory.length === 0 ? 'block' : 'none';
+  renderConversationList();
+}
+
+async function createNewConversation() {
+  if (isLoading) return;
+  const { data, error } = await supabase
+    .from('conversations')
+    .insert({ user_id: currentUser.id, title: 'New Chat' })
+    .select('id, title, updated_at')
+    .single();
+  if (error) {
+    console.error('Create conversation error:', error);
+    showToast('Error creating new chat');
+    return;
+  }
+  const newConv = {
+    id: data.id,
+    title: data.title,
+    updatedAt: new Date(data.updated_at)
+  };
+  conversations.unshift(newConv);
+  renderConversationList();
+  currentConversationId = newConv.id;
+  chatHistory = [];
+  messagesDiv.innerHTML = '';
+  welcomeMsgDiv.style.display = 'block';
+  if (window.innerWidth <= 768) sidebar.classList.remove('open');
+}
+
+// Export chat
 function exportChat() {
   if (chatHistory.length === 0) { showToast('No conversation to export yet.'); return; }
   let text = `My Business AI — Consultation Report\nBusiness: ${userProfile.bizName} (${userProfile.bizType})\nDate: ${new Date().toLocaleDateString()}\n\n`;
@@ -1140,6 +1009,8 @@ function exportChat() {
   });
   navigator.clipboard.writeText(text).then(() => showToast('✅ Report copied'));
 }
+
+// Share app
 function shareApp(platform) {
   const msg = encodeURIComponent(`🧠 I just used My Business AI to get expert business advice — completely free! Try it: ${APP_URL}`);
   const urls = {
@@ -1149,52 +1020,9 @@ function shareApp(platform) {
   };
   window.open(urls[platform], '_blank');
 }
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.style.display = 'block';
-  setTimeout(() => t.style.display = 'none', 3000);
-}
-document.getElementById('newChatBtn').addEventListener('click', createNewConversation);
-document.getElementById('signOutBtn').addEventListener('click', () => { auth.signOut(); window.location.reload(); });
-document.getElementById('exportChatBtn').addEventListener('click', exportChat);
-document.querySelectorAll('.topic-pill').forEach(pill => {
-  pill.addEventListener('click', () => setTopic(pill, pill.getAttribute('data-topic')));
-});
-document.getElementById('menuToggle')?.addEventListener('click', () => {
-  document.getElementById('sidebar').classList.toggle('open');
-});
-document.addEventListener('click', (e) => {
-  const sidebar = document.getElementById('sidebar');
-  const menuToggle = document.getElementById('menuToggle');
-  if (window.innerWidth <= 768 && sidebar.classList.contains('open') && !sidebar.contains(e.target) && e.target !== menuToggle) {
-    sidebar.classList.remove('open');
-  }
-});
+window.shareApp = shareApp;
 
-// ========== PRO FEATURES: locked (show upgrade modal) ==========
-function showUpgradeModal() {
-  upgradeModal.style.display = 'flex';
-}
-if (exportPdfBtn) exportPdfBtn.onclick = showUpgradeModal;
-if (businessPlanBtn) businessPlanBtn.onclick = showUpgradeModal;
-
-// Notify button in upgrade modal
-document.getElementById('notifySubmitBtn')?.addEventListener('click', () => {
-  const email = document.getElementById('notifyEmail').value.trim();
-  if (!email) {
-    alert('Please enter your email address.');
-    return;
-  }
-  // In a real implementation, you would save this email to Firestore or a mailing list.
-  // For now, just close modal and show a thank you.
-  upgradeModal.style.display = 'none';
-  showToast('Thank you! We will notify you when Pro is available.');
-  document.getElementById('notifyEmail').value = '';
-});
-document.getElementById('proNotifyBtn')?.addEventListener('click', showUpgradeModal);
-
-// ========== Auth modal logic ==========
+// Auth modal logic
 const authModal = document.getElementById('authModal');
 const signinTab = document.getElementById('modalSigninTab');
 const signupTab = document.getElementById('modalSignupTab');
@@ -1248,7 +1076,8 @@ signinFormModal.onsubmit = async (e) => {
   const email = signinEmail.value.trim();
   const password = signinPassword.value;
   try {
-    await auth.signInWithEmailAndPassword(email, password);
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
     authModal.style.display = 'none';
   } catch (err) {
     signinMessage.textContent = err.message;
@@ -1266,8 +1095,14 @@ signupFormModal.onsubmit = async (e) => {
     return;
   }
   try {
-    await auth.createUserWithEmailAndPassword(email, password);
-    authModal.style.display = 'none';
+    const { error } = await supabase.auth.signUp({ email, password });
+    if (error) throw error;
+    // Auto sign-in after sign-up? Supabase sends confirmation email by default.
+    // For simplicity, we'll tell user to confirm email.
+    signupMessage.textContent = 'Account created! Please check your email to confirm.';
+    signupMessage.classList.remove('error');
+    // Optionally, sign in immediately if email confirmation is disabled in Supabase settings.
+    // We'll assume confirmation is required, so we don't close modal automatically.
   } catch (err) {
     signupMessage.textContent = err.message;
     signupMessage.classList.add('error');
@@ -1275,29 +1110,86 @@ signupFormModal.onsubmit = async (e) => {
 };
 
 // Auth state listener
-auth.onAuthStateChanged(user => {
-  if (user) {
+supabase.auth.onAuthStateChange(async (event, session) => {
+  if (session) {
+    currentUser = session.user;
+    // Check if profile exists, create if not
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', currentUser.id)
+      .single();
+    if (profileError && profileError.code === 'PGRST116') {
+      // Profile doesn't exist, create with default values
+      await supabase.from('profiles').insert({
+        id: currentUser.id,
+        email: currentUser.email,
+        name: '',
+        biz_name: '',
+        biz_type: ''
+      });
+      userProfile = { name: '', bizName: '', bizType: '' };
+    } else if (profile) {
+      userProfile = {
+        name: profile.name || '',
+        bizName: profile.biz_name || '',
+        bizType: profile.biz_type || ''
+      };
+    }
     landingPage.style.display = 'none';
     appWrapper.style.display = 'flex';
-    currentUser = user;
-    db.collection('users').doc(user.uid).get().then(doc => {
-      if (doc.exists && doc.data().name) {
-        userProfile = { name: doc.data().name, bizName: doc.data().bizName, bizType: doc.data().bizType };
-        showMainApp();
-      } else {
-        document.getElementById('profileSetup').style.display = 'block';
-        initProfileForm();
-      }
-    });
+    headerBiz.textContent = `${userProfile.bizName || 'Your Business'} · ${userProfile.bizType || 'Entrepreneur'}`;
+    document.getElementById('welcomeTitle').textContent = `Hello, ${userProfile.name || 'Entrepreneur'}! 👋`;
+    document.getElementById('welcomeText').textContent = `I am ready to consult on your business. Pick a topic above or ask me anything below.`;
+    renderSuggestions();
+    loadConversations();
   } else {
     landingPage.style.display = 'flex';
     appWrapper.style.display = 'none';
+    currentUser = null;
+  }
+});
+
+// Topic suggestions and rendering
+function setTopic(el, topic) {
+  document.querySelectorAll('.topic-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  currentTopic = topic;
+  renderSuggestions();
+}
+function renderSuggestions() {
+  const suggestions = TOPIC_SUGGESTIONS[currentTopic] || TOPIC_SUGGESTIONS['General Business'];
+  quickSuggestionsDiv.innerHTML = suggestions.map(s =>
+    `<button class="suggestion-btn" onclick="useSuggestion('${s.replace(/'/g,"\\'")}')">${s}</button>`
+  ).join('');
+}
+function useSuggestion(text) {
+  msgInput.value = text;
+  welcomeMsgDiv.style.display = 'none';
+  sendMessage();
+}
+
+// Event listeners
+sendBtn.addEventListener('click', sendMessage);
+msgInput.addEventListener('keydown', handleKey);
+newChatBtn.addEventListener('click', createNewConversation);
+signOutBtn.addEventListener('click', async () => { await supabase.auth.signOut(); window.location.reload(); });
+exportChatBtn.addEventListener('click', exportChat);
+document.querySelectorAll('.topic-pill').forEach(pill => {
+  pill.addEventListener('click', () => setTopic(pill, pill.getAttribute('data-topic')));
+});
+menuToggle?.addEventListener('click', () => sidebar.classList.toggle('open'));
+document.addEventListener('click', (e) => {
+  if (window.innerWidth <= 768 && sidebar.classList.contains('open') && !sidebar.contains(e.target) && e.target !== menuToggle) {
+    sidebar.classList.remove('open');
   }
 });
 
 // PWA install
+let deferredPrompt;
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
+  deferredPrompt = e;
   const fab = document.getElementById('installBtn');
   if (fab) fab.style.display = 'flex';
   fab.onclick = async () => { e.prompt(); const { outcome } = await e.userChoice; if (outcome === 'accepted') fab.style.display = 'none'; };
