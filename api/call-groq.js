@@ -1,37 +1,74 @@
 // api/call-groq.js
 const https = require('https');
-const { createClient } = require('@supabase/supabase-js');
+const admin = require('firebase-admin');
 
-const supabaseAdmin = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY,
-  { auth: { autoRefreshToken: false, persistSession: false } }
-);
+if (!admin.apps.length) {
+  const serviceAccount = JSON.parse(process.env.FIREBASE_ADMIN_JSON);
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+  });
+}
+const db = admin.firestore();
 
 module.exports = async function handler(req, res) {
-  // CORS – allow your frontend domain (or keep * for now)
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  // Get Supabase auth token from Authorization header
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Missing authorization token' });
   }
-  const token = authHeader.split('Bearer ')[1];
+  const idToken = authHeader.split('Bearer ')[1];
 
-  // Verify token and get user
-  const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
-  if (userError || !user) {
-    console.error('Auth error:', userError);
+  const firebaseApiKey = process.env.FIREBASE_API_KEY;
+  if (!firebaseApiKey) {
+    return res.status(500).json({ error: 'FIREBASE_API_KEY not configured' });
+  }
+
+  let userId;
+  try {
+    const verifyData = JSON.stringify({ idToken });
+    const verifyRes = await new Promise((resolve, reject) => {
+      const options = {
+        hostname: 'identitytoolkit.googleapis.com',
+        path: `/v1/accounts:lookup?key=${firebaseApiKey}`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(verifyData)
+        }
+      };
+      const request = https.request(options, (response) => {
+        let raw = '';
+        response.on('data', chunk => raw += chunk);
+        response.on('end', () => {
+          if (response.statusCode !== 200) {
+            reject(new Error(`Token verification failed: ${response.statusCode}`));
+            return;
+          }
+          try {
+            const parsed = JSON.parse(raw);
+            if (parsed.users && parsed.users.length > 0) {
+              resolve(parsed.users[0]);
+            } else {
+              reject(new Error('No user found'));
+            }
+          } catch (e) { reject(e); }
+        });
+      });
+      request.on('error', reject);
+      request.write(verifyData);
+      request.end();
+    });
+    userId = verifyRes.localId;
+  } catch (err) {
+    console.error('Token verification error:', err.message);
     return res.status(401).json({ error: 'Invalid token' });
   }
-  const userId = user.id;
 
-  // Parse request body
   let body;
   try {
     body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
@@ -47,35 +84,31 @@ module.exports = async function handler(req, res) {
   // Get or create conversation
   let activeConversationId = conversationId;
   if (!activeConversationId) {
-    const { data: newConv, error: convError } = await supabaseAdmin
-      .from('conversations')
-      .insert({ user_id: userId, title: 'New Chat' })
-      .select('id')
-      .single();
-    if (convError) {
-      console.error('Create conversation error:', convError);
-      return res.status(500).json({ error: 'Failed to create conversation' });
-    }
-    activeConversationId = newConv.id;
+    const convRef = db.collection('users').doc(userId).collection('conversations').doc();
+    activeConversationId = convRef.id;
+    await convRef.set({
+      title: 'New Chat',
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      messages: []
+    });
   } else {
     // Verify conversation belongs to user
-    const { data: conv, error: checkError } = await supabaseAdmin
-      .from('conversations')
-      .select('id')
-      .eq('id', activeConversationId)
-      .eq('user_id', userId)
-      .single();
-    if (checkError || !conv) {
-      return res.status(403).json({ error: 'Conversation not found or access denied' });
+    const convDoc = await db.collection('users').doc(userId).collection('conversations').doc(activeConversationId).get();
+    if (!convDoc.exists) {
+      return res.status(403).json({ error: 'Conversation not found' });
     }
   }
 
   // Save user message
-  await supabaseAdmin
-    .from('messages')
-    .insert({ conversation_id: activeConversationId, role: 'user', content: userPrompt });
+  const userMessage = { role: 'user', content: userPrompt, timestamp: new Date().toISOString() };
+  await db.collection('users').doc(userId).collection('conversations').doc(activeConversationId)
+    .update({
+      messages: admin.firestore.FieldValue.arrayUnion(userMessage),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
 
-  // Call Groq API
+  // Call Groq
   const groqApiKey = process.env.GROQ_API_KEY;
   if (!groqApiKey) {
     return res.status(500).json({ error: 'GROQ_API_KEY not configured' });
@@ -115,9 +148,7 @@ module.exports = async function handler(req, res) {
           }
           try {
             resolve(JSON.parse(raw));
-          } catch (e) {
-            reject(new Error('Invalid JSON from Groq'));
-          }
+          } catch (e) { reject(new Error('Invalid JSON from Groq')); }
         });
       });
       request.on('error', reject);
@@ -125,28 +156,21 @@ module.exports = async function handler(req, res) {
       request.end();
     });
     const reply = groqResponse.choices?.[0]?.message?.content;
-    if (!reply) {
-      throw new Error('No reply from Groq');
-    }
+    if (!reply) throw new Error('No reply from Groq');
 
     // Save assistant message
-    await supabaseAdmin
-      .from('messages')
-      .insert({ conversation_id: activeConversationId, role: 'assistant', content: reply });
+    const assistantMessage = { role: 'assistant', content: reply, timestamp: new Date().toISOString() };
+    await db.collection('users').doc(userId).collection('conversations').doc(activeConversationId)
+      .update({
+        messages: admin.firestore.FieldValue.arrayUnion(assistantMessage),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      });
 
-    // Update conversation's updated_at and maybe title (if first user message)
-    if (!conversationId) {
-      // New conversation: set title from first user message
+    // Update title if it's the first user message
+    const convDoc = await db.collection('users').doc(userId).collection('conversations').doc(activeConversationId).get();
+    if (convDoc.data().title === 'New Chat') {
       const newTitle = userPrompt.slice(0, 30) + (userPrompt.length > 30 ? '…' : '');
-      await supabaseAdmin
-        .from('conversations')
-        .update({ title: newTitle, updated_at: new Date().toISOString() })
-        .eq('id', activeConversationId);
-    } else {
-      await supabaseAdmin
-        .from('conversations')
-        .update({ updated_at: new Date().toISOString() })
-        .eq('id', activeConversationId);
+      await convDoc.ref.update({ title: newTitle });
     }
 
     res.status(200).json({ output: reply, conversationId: activeConversationId });
