@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<meta name="theme-color" content="#0a0e1a"/>
-<meta name="description" content="My Business AI — Your personal AI business consultant. Get expert advice on growth, finance, marketing and more."/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a0e1a">
+<meta name="description" content="My Business AI — Your personal AI business consultant. Get expert advice on growth, finance, marketing and more.">
 <title>My Business AI | TeaJay Konsult Ltd.</title>
-<link rel="manifest" href="manifest.json"/>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
 <style>
 /* ========== ORIGINAL STYLES (unchanged) ========== */
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -528,7 +531,7 @@ footer{text-align:center;padding:14px;font-size:11px;color:var(--sub);border-top
 </head>
 <body>
 
-<!-- LANDING PAGE -->
+<!-- LANDING PAGE (shown when not logged in) -->
 <div id="landingPage" class="landing">
   <div class="landing-header">
     <div class="logo">
@@ -536,8 +539,8 @@ footer{text-align:center;padding:14px;font-size:11px;color:var(--sub);border-top
       <p>by TeaJay Konsult</p>
     </div>
     <div class="nav-buttons">
-      <button class="btn-outline" id="landingSigninBtn" onclick="openModal(true)">Sign In</button>
-      <button class="btn-primary" id="landingSignupBtn" onclick="openModal(false)">Sign Up</button>
+      <button class="btn-outline" id="landingSigninBtn">Sign In</button>
+      <button class="btn-primary" id="landingSignupBtn">Sign Up</button>
     </div>
   </div>
   <div class="hero">
@@ -546,8 +549,8 @@ footer{text-align:center;padding:14px;font-size:11px;color:var(--sub);border-top
         <h1>AI Business Consultant<br>for <span>African Entrepreneurs</span></h1>
         <p>Get expert advice on growth, finance, marketing, and more. Tailored for the African business environment. Free tier available.</p>
         <div class="cta-buttons" style="display: flex; gap: 16px; flex-wrap: wrap;">
-          <button class="btn-primary" id="heroSignupBtn" onclick="openModal(false)">Start Free →</button>
-          <button class="btn-outline" id="heroSigninBtn" onclick="openModal(true)">Sign In</button>
+          <button class="btn-primary" id="heroSignupBtn">Start Free →</button>
+          <button class="btn-outline" id="heroSigninBtn">Sign In</button>
         </div>
         <div class="hero-stats">
           <div><div class="stat-number">24/7</div><div class="stat-label">Always Available</div></div>
@@ -578,14 +581,22 @@ footer{text-align:center;padding:14px;font-size:11px;color:var(--sub);border-top
         <h3>Free</h3>
         <div class="price">₦0<span>/month</span></div>
         <ul><li>Unlimited chat conversations</li><li>Basic business advice</li><li>Chat history (30 days)</li><li>Email support</li></ul>
-        <button class="btn-pricing freeSignupBtn" onclick="openModal(false)">Get Started</button>
+        <button class="btn-pricing freeSignupBtn">Get Started</button>
       </div>
       <div class="pricing-card popular">
-        <div class="popular-badge">Pro</div>
+        <div class="popular-badge">Pro – Coming Soon</div>
         <h3>Pro</h3>
         <div class="price">₦2,000<span>/month</span></div>
-        <ul><li>Export chat as PDF</li><li>Advanced analytics & charts</li><li>Custom business plan templates</li><li>Priority 24h support</li><li>Unlimited chat history</li><li>Team sharing (basic)</li></ul>
-        <button class="btn-pricing" disabled>Coming Soon</button>
+        <ul>
+          <li>Export chat as PDF</li>
+          <li>Advanced analytics & charts</li>
+          <li>Business plan generator</li>
+          <li>CV / Resume builder</li>
+          <li>Priority 24h support</li>
+          <li>Unlimited chat history</li>
+          <li>Team sharing (basic)</li>
+        </ul>
+        <button class="btn-pricing" id="proComingSoonBtn" style="background:transparent; border:1px solid #00d4ff; color:#00d4ff;">Notify Me</button>
       </div>
     </div>
   </div>
@@ -631,6 +642,7 @@ footer{text-align:center;padding:14px;font-size:11px;color:var(--sub);border-top
       <div class="header-info"><div class="hi-name">My Business AI</div><div class="hi-biz" id="headerBiz">Loading...</div></div>
       <div class="header-actions">
         <button class="hdr-btn" id="exportChatBtn">📋 Export</button>
+        <button class="pro-btn" id="proUpgradeBtn">🔓 Upgrade to Pro</button>
       </div>
     </div>
     <div class="categories-bar" id="categoriesBar">
@@ -660,11 +672,39 @@ footer{text-align:center;padding:14px;font-size:11px;color:var(--sub);border-top
   </div>
 </div>
 
+<!-- Pro upgrade modal (coming soon) -->
+<div id="proModal" class="modal">
+  <div class="modal-content">
+    <h3>🚀 Pro Plan – Coming Soon</h3>
+    <p>Unlock these powerful features:</p>
+    <ul style="text-align:left; margin:16px 0; padding-left:20px;">
+      <li>📄 Export chat as PDF</li>
+      <li>📊 Advanced analytics & charts</li>
+      <li>📝 Business plan generator</li>
+      <li>📄 CV / Resume builder</li>
+      <li>⚡ Priority 24h support</li>
+      <li>💬 Unlimited chat history</li>
+      <li>👥 Team sharing (basic)</li>
+    </ul>
+    <button onclick="document.getElementById('proModal').style.display='none'">Close</button>
+  </div>
+</div>
+
 <script>
-// Supabase configuration
-const SUPABASE_URL = 'https://wyccjkniwihxktjnchoh.supabase.co'; // REPLACE WITH YOUR URL
-const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY_HERE'; // REPLACE WITH YOUR ANON KEY (starts eyJ)
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Firebase Config (Business AI project)
+const firebaseConfig = {
+  apiKey: "AIzaSyBePGaNA1F7bAqyPq8jqPdMmu2ndBsHYZE",
+  authDomain: "teajay-business-ai.firebaseapp.com",
+  projectId: "teajay-business-ai",
+  storageBucket: "teajay-business-ai.firebasestorage.app",
+  messagingSenderId: "432325399013",
+  appId: "1:432325399013:web:d6ae3b95bf2ebe815b9f0c",
+  measurementId: "G-YSGPJ4LCBG"
+};
+firebase.initializeApp(firebaseConfig);
+firebase.analytics();
+const auth = firebase.auth();
+const db = firebase.firestore();
 
 // DOM elements
 const landingPage = document.getElementById('landingPage');
@@ -681,6 +721,8 @@ const quickSuggestionsDiv = document.getElementById('quickSuggestions');
 const exportChatBtn = document.getElementById('exportChatBtn');
 const menuToggle = document.getElementById('menuToggle');
 const sidebar = document.getElementById('sidebar');
+const proUpgradeBtn = document.getElementById('proUpgradeBtn');
+const proModal = document.getElementById('proModal');
 
 // Global state
 let currentUser = null;
@@ -690,7 +732,6 @@ let currentConversationId = null;
 let conversations = [];
 let chatHistory = [];
 let isLoading = false;
-let selectedCatEl = null;
 let currentChart = null;
 
 const FUNCTION_URL = '/api/call-groq';
@@ -749,9 +790,9 @@ function appendMsgToDOM(text, role) {
   avatar.textContent = role === 'bot' ? '🧠' : initials;
   const bubble = document.createElement('div');
   bubble.className = `msg-bubble ${role}`;
+  let chartHtml = '';
+  let displayText = text;
   if (role === 'bot') {
-    let chartHtml = '';
-    let displayText = text;
     const chartMatch = text.match(/```chart\n([\s\S]*?)\n```/);
     if (chartMatch) {
       try {
@@ -861,12 +902,10 @@ async function sendMessage() {
   appendMsg(msg, 'user', true);
   const typing = appendTyping();
   try {
-    const { data: { session } } = await supabase.auth.getSession();
-    const token = session?.access_token;
-    if (!token) throw new Error('No session token');
+    const idToken = await currentUser.getIdToken();
     const res = await fetch(FUNCTION_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
       body: JSON.stringify({
         prompt: msg,
         system: buildSystemPrompt(),
@@ -889,7 +928,7 @@ async function sendMessage() {
     } else {
       appendMsg('I encountered an issue. Please try again.', 'bot', true);
     }
-    await loadConversations();
+    loadConversations();
   } catch (err) {
     typing.remove();
     appendMsg(`❌ Error: ${err.message}`, 'bot', true);
@@ -901,21 +940,17 @@ async function sendMessage() {
 
 async function loadConversations() {
   if (!currentUser) return;
-  const { data, error } = await supabase
-    .from('conversations')
-    .select('id, title, updated_at')
-    .eq('user_id', currentUser.id)
-    .order('updated_at', { ascending: false });
-  if (error) {
-    console.error('Load conversations error:', error);
-    showToast('Error loading conversations');
-    return;
-  }
-  conversations = data.map(conv => ({
-    id: conv.id,
-    title: conv.title || 'New Chat',
-    updatedAt: new Date(conv.updated_at)
-  }));
+  const snapshot = await db.collection('users').doc(currentUser.uid).collection('conversations')
+    .orderBy('updatedAt', 'desc').get();
+  conversations = [];
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    conversations.push({
+      id: doc.id,
+      title: data.title || 'New Chat',
+      updatedAt: data.updatedAt?.toDate() || new Date()
+    });
+  });
   renderConversationList();
   if (conversations.length === 0) {
     await createNewConversation();
@@ -942,17 +977,12 @@ function renderConversationList() {
 async function switchConversation(convId) {
   if (isLoading) return;
   currentConversationId = convId;
-  const { data, error } = await supabase
-    .from('messages')
-    .select('role, content')
-    .eq('conversation_id', convId)
-    .order('created_at', { ascending: true });
-  if (error) {
-    console.error('Load messages error:', error);
-    showToast('Error loading messages');
-    return;
+  const doc = await db.collection('users').doc(currentUser.uid).collection('conversations').doc(convId).get();
+  if (doc.exists) {
+    chatHistory = doc.data().messages || [];
+  } else {
+    chatHistory = [];
   }
-  chatHistory = data.map(msg => ({ role: msg.role, text: msg.content }));
   messagesDiv.innerHTML = '';
   for (const msg of chatHistory) {
     appendMsgToDOM(msg.text, msg.role);
@@ -963,24 +993,17 @@ async function switchConversation(convId) {
 
 async function createNewConversation() {
   if (isLoading) return;
-  const { data, error } = await supabase
-    .from('conversations')
-    .insert({ user_id: currentUser.id, title: 'New Chat' })
-    .select('id, title, updated_at')
-    .single();
-  if (error) {
-    console.error('Create conversation error:', error);
-    showToast('Error creating new chat');
-    return;
-  }
-  const newConv = {
-    id: data.id,
-    title: data.title,
-    updatedAt: new Date(data.updated_at)
-  };
-  conversations.unshift(newConv);
+  const convRef = db.collection('users').doc(currentUser.uid).collection('conversations').doc();
+  const title = 'New Chat';
+  await convRef.set({
+    title: title,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    messages: []
+  });
+  conversations.unshift({ id: convRef.id, title, updatedAt: new Date() });
   renderConversationList();
-  currentConversationId = newConv.id;
+  currentConversationId = convRef.id;
   chatHistory = [];
   messagesDiv.innerHTML = '';
   welcomeMsgDiv.style.display = 'block';
@@ -1021,7 +1044,6 @@ const signinMessage = document.getElementById('modalSigninMessage');
 const signupMessage = document.getElementById('modalSignupMessage');
 
 function openModal(showSignIn = true) {
-  alert('openModal called'); // temporary alert to confirm the function is triggered
   authModal.style.display = 'flex';
   if (showSignIn) {
     signinTab.classList.add('active');
@@ -1035,9 +1057,11 @@ function openModal(showSignIn = true) {
     signinFormModal.classList.add('hidden');
   }
 }
-
-// Inline onclick handlers are already added to buttons, so we don't need addEventListener
-// But we still need the close button and tab switching.
+document.getElementById('landingSigninBtn')?.addEventListener('click', () => openModal(true));
+document.getElementById('landingSignupBtn')?.addEventListener('click', () => openModal(false));
+document.getElementById('heroSigninBtn')?.addEventListener('click', () => openModal(true));
+document.getElementById('heroSignupBtn')?.addEventListener('click', () => openModal(false));
+document.querySelectorAll('.freeSignupBtn').forEach(btn => btn.addEventListener('click', () => openModal(false)));
 document.getElementById('closeModalBtn')?.addEventListener('click', () => authModal.style.display = 'none');
 window.addEventListener('click', (e) => { if (e.target === authModal) authModal.style.display = 'none'; });
 
@@ -1060,8 +1084,7 @@ signinFormModal.onsubmit = async (e) => {
   const email = signinEmail.value.trim();
   const password = signinPassword.value;
   try {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
+    await auth.signInWithEmailAndPassword(email, password);
     authModal.style.display = 'none';
   } catch (err) {
     signinMessage.textContent = err.message;
@@ -1079,10 +1102,15 @@ signupFormModal.onsubmit = async (e) => {
     return;
   }
   try {
-    const { error } = await supabase.auth.signUp({ email, password });
-    if (error) throw error;
-    signupMessage.textContent = 'Account created! Please check your email to confirm.';
-    signupMessage.classList.remove('error');
+    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+    await db.collection('users').doc(userCredential.user.uid).set({
+      email: email,
+      name: '',
+      bizName: '',
+      bizType: '',
+      createdAt: new Date().toISOString()
+    });
+    authModal.style.display = 'none';
   } catch (err) {
     signupMessage.textContent = err.message;
     signupMessage.classList.add('error');
@@ -1090,30 +1118,24 @@ signupFormModal.onsubmit = async (e) => {
 };
 
 // Auth state listener
-supabase.auth.onAuthStateChange(async (event, session) => {
-  if (session) {
-    currentUser = session.user;
-    // Check if profile exists, create if not
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', currentUser.id)
-      .single();
-    if (profileError && profileError.code === 'PGRST116') {
-      await supabase.from('profiles').insert({
-        id: currentUser.id,
-        email: currentUser.email,
-        name: '',
-        biz_name: '',
-        biz_type: ''
-      });
-      userProfile = { name: '', bizName: '', bizType: '' };
-    } else if (profile) {
+auth.onAuthStateChanged(async (user) => {
+  if (user) {
+    currentUser = user;
+    const doc = await db.collection('users').doc(user.uid).get();
+    if (doc.exists) {
       userProfile = {
-        name: profile.name || '',
-        bizName: profile.biz_name || '',
-        bizType: profile.biz_type || ''
+        name: doc.data().name || '',
+        bizName: doc.data().bizName || '',
+        bizType: doc.data().bizType || ''
       };
+    } else {
+      await db.collection('users').doc(user.uid).set({
+        email: user.email,
+        name: '',
+        bizName: '',
+        bizType: '',
+        createdAt: new Date().toISOString()
+      });
     }
     landingPage.style.display = 'none';
     appWrapper.style.display = 'flex';
@@ -1150,7 +1172,7 @@ function useSuggestion(text) {
 sendBtn.addEventListener('click', sendMessage);
 msgInput.addEventListener('keydown', handleKey);
 newChatBtn.addEventListener('click', createNewConversation);
-signOutBtn.addEventListener('click', async () => { await supabase.auth.signOut(); window.location.reload(); });
+signOutBtn.addEventListener('click', async () => { await auth.signOut(); window.location.reload(); });
 exportChatBtn.addEventListener('click', exportChat);
 document.querySelectorAll('.topic-pill').forEach(pill => {
   pill.addEventListener('click', () => setTopic(pill, pill.getAttribute('data-topic')));
@@ -1161,7 +1183,14 @@ document.addEventListener('click', (e) => {
     sidebar.classList.remove('open');
   }
 });
+proUpgradeBtn?.addEventListener('click', () => {
+  proModal.style.display = 'flex';
+});
+window.addEventListener('click', (e) => {
+  if (e.target === proModal) proModal.style.display = 'none';
+});
 
+// PWA install
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
