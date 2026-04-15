@@ -14,7 +14,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
 <style>
-/* (your existing styles – unchanged – keep them as they are) */
+/* ========== ORIGINAL STYLES (unchanged) ========== */
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 :root{
 --bg:#0a0e1a;
@@ -628,6 +628,42 @@ footer{text-align:center;padding:14px;font-size:11px;color:var(--sub);border-top
   </div>
 </div>
 
+<!-- PROFILE SETUP (shown after sign-up) -->
+<div id="profileSetup" class="modal" style="display:none;">
+  <div class="modal-content" style="max-width:500px;">
+    <h2>Tell us about your business</h2>
+    <div class="form-group">
+      <label>Your Name (how AI should call you)</label>
+      <input type="text" id="userName" placeholder="e.g., Emeka, Fatima">
+    </div>
+    <div class="form-group">
+      <label>Business Name</label>
+      <input type="text" id="bizName" placeholder="e.g., Mama's Kitchen">
+    </div>
+    <div class="form-group">
+      <label>Business Type</label>
+      <select id="bizTypeSelect">
+        <option value="">Select a category</option>
+        <option value="Retail & Shop">🛍️ Retail & Shop</option>
+        <option value="Restaurant & Food">🍽️ Restaurant & Food</option>
+        <option value="Tech & Software">💻 Tech & Software</option>
+        <option value="Freelance & Services">💼 Freelance & Services</option>
+        <option value="Agriculture & Farming">🌾 Agriculture</option>
+        <option value="Fashion & Beauty">👗 Fashion & Beauty</option>
+        <option value="Education & Training">📚 Education</option>
+        <option value="Healthcare & Wellness">🏥 Healthcare</option>
+        <option value="Real Estate">🏠 Real Estate</option>
+        <option value="E-commerce">🛒 E‑commerce</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Or type your own</label>
+      <input type="text" id="customBizType" placeholder="e.g., Solar installation">
+    </div>
+    <button id="saveProfileBtn" class="ob-start">Continue</button>
+  </div>
+</div>
+
 <!-- DASHBOARD -->
 <div id="appWrapper" class="app-wrapper" style="display:none;">
   <div class="sidebar" id="sidebar">
@@ -723,6 +759,12 @@ const menuToggle = document.getElementById('menuToggle');
 const sidebar = document.getElementById('sidebar');
 const proUpgradeBtn = document.getElementById('proUpgradeBtn');
 const proModal = document.getElementById('proModal');
+const profileSetupModal = document.getElementById('profileSetup');
+const userNameInput = document.getElementById('userName');
+const bizNameInput = document.getElementById('bizName');
+const bizTypeSelect = document.getElementById('bizTypeSelect');
+const customBizType = document.getElementById('customBizType');
+const saveProfileBtn = document.getElementById('saveProfileBtn');
 
 // Global state
 let currentUser = null;
@@ -927,7 +969,6 @@ async function sendMessage() {
       appendMsg('I encountered an issue. Please try again.', 'bot', true);
     }
     await refreshConversationList();
-    await loadUserProfile();
   } catch (err) {
     typing.remove();
     appendMsg(`❌ Error: ${err.message}`, 'bot', true);
@@ -972,7 +1013,6 @@ async function refreshConversationList() {
     });
   });
   renderConversationList();
-  // Do NOT switch conversation – keep currentConversationId
 }
 
 function renderConversationList() {
@@ -1054,14 +1094,18 @@ window.shareApp = shareApp;
 async function loadUserProfile() {
   if (!currentUser) return;
   const doc = await db.collection('users').doc(currentUser.uid).get();
-  if (doc.exists) {
+  if (doc.exists && doc.data().name) {
     userProfile = {
-      name: doc.data().name || '',
-      bizName: doc.data().bizName || '',
-      bizType: doc.data().bizType || ''
+      name: doc.data().name,
+      bizName: doc.data().bizName,
+      bizType: doc.data().bizType
     };
-    headerBiz.textContent = `${userProfile.bizName || 'Your Business'} · ${userProfile.bizType || 'Entrepreneur'}`;
+    headerBiz.textContent = `${userProfile.bizName} · ${userProfile.bizType}`;
+    document.getElementById('welcomeTitle').textContent = `Hello, ${userProfile.name}! 👋`;
+    document.getElementById('welcomeText').textContent = `I am ready to consult on ${userProfile.bizName} — your ${userProfile.bizType} business. Pick a topic above or ask me anything below.`;
+    return true;
   }
+  return false;
 }
 
 // Auth modal logic
@@ -1120,11 +1164,18 @@ signinFormModal.onsubmit = async (e) => {
   try {
     await auth.signInWithEmailAndPassword(email, password);
     authModal.style.display = 'none';
+    const hasProfile = await loadUserProfile();
+    if (hasProfile) {
+      showMainApp();
+    } else {
+      profileSetupModal.style.display = 'flex';
+    }
   } catch (err) {
     signinMessage.textContent = err.message;
     signinMessage.classList.add('error');
   }
 };
+
 signupFormModal.onsubmit = async (e) => {
   e.preventDefault();
   signupMessage.textContent = '';
@@ -1137,31 +1188,60 @@ signupFormModal.onsubmit = async (e) => {
   }
   try {
     const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-    await db.collection('users').doc(userCredential.user.uid).set({
-      email: email,
-      name: '',
-      bizName: '',
-      bizType: '',
-      createdAt: new Date().toISOString()
-    });
     authModal.style.display = 'none';
+    // Show profile setup
+    profileSetupModal.style.display = 'flex';
   } catch (err) {
     signupMessage.textContent = err.message;
     signupMessage.classList.add('error');
   }
 };
 
+saveProfileBtn.addEventListener('click', async () => {
+  const name = userNameInput.value.trim();
+  const bizName = bizNameInput.value.trim();
+  let bizType = bizTypeSelect.value;
+  const custom = customBizType.value.trim();
+  if (custom) bizType = custom;
+  if (!name || !bizName || !bizType) {
+    showToast('Please fill all fields');
+    return;
+  }
+  await db.collection('users').doc(currentUser.uid).set({
+    name, bizName, bizType, email: currentUser.email,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }, { merge: true });
+  userProfile = { name, bizName, bizType };
+  profileSetupModal.style.display = 'none';
+  showMainApp();
+});
+
+function showMainApp() {
+  landingPage.style.display = 'none';
+  appWrapper.style.display = 'flex';
+  headerBiz.textContent = `${userProfile.bizName} · ${userProfile.bizType}`;
+  document.getElementById('welcomeTitle').textContent = `Hello, ${userProfile.name}! 👋`;
+  document.getElementById('welcomeText').textContent = `I am ready to consult on ${userProfile.bizName} — your ${userProfile.bizType} business. Pick a topic above or ask me anything below.`;
+  renderSuggestions();
+  loadConversations();
+}
+
 // Auth state listener
 auth.onAuthStateChanged(async (user) => {
   if (user) {
     currentUser = user;
-    await loadUserProfile();
-    await loadConversations();
-    landingPage.style.display = 'none';
-    appWrapper.style.display = 'flex';
-    document.getElementById('welcomeTitle').textContent = `Hello, ${userProfile.name || 'Entrepreneur'}! 👋`;
-    document.getElementById('welcomeText').textContent = `I am ready to consult on your business. Pick a topic above or ask me anything below.`;
-    renderSuggestions();
+    const hasProfile = await loadUserProfile();
+    if (hasProfile) {
+      showMainApp();
+    } else {
+      landingPage.style.display = 'flex';
+      appWrapper.style.display = 'none';
+      // If signed in but no profile, show profile setup? Actually, we already show it after sign-up.
+      // For existing users without profile (if any), we can redirect to profile setup.
+      if (user) {
+        profileSetupModal.style.display = 'flex';
+      }
+    }
   } else {
     landingPage.style.display = 'flex';
     appWrapper.style.display = 'none';
