@@ -42,7 +42,7 @@ h1,h2,h3,h4{font-family:'Syne',sans-serif}
 .glass{background:rgba(15,22,40,0.7);backdrop-filter:blur(10px);border:1px solid var(--cyan-border);}
 .transition-all{transition:all 0.2s ease;}
 
-/* Landing page styles (unchanged) */
+/* Landing page styles */
 .landing {
   display: flex;
   flex-direction: column;
@@ -1022,10 +1022,12 @@ function renderConversationList() {
     div.className = 'conversation-item' + (currentConversationId === conv.id ? ' active' : '');
     div.innerHTML = `<div class="conversation-title">${escapeHtml(conv.title)}</div>
                      <div class="conversation-date">${conv.updatedAt.toLocaleDateString()}</div>`;
-    div.onclick = () => {
-      switchConversation(conv.id);
-      if (window.innerWidth <= 768) sidebar.classList.remove('open');
-    };
+    div.onclick = (function(id) {
+      return function() {
+        switchConversation(id);
+        if (window.innerWidth <= 768) sidebar.classList.remove('open');
+      };
+    })(conv.id);
     conversationList.appendChild(div);
   });
 }
@@ -1189,7 +1191,6 @@ signupFormModal.onsubmit = async (e) => {
   try {
     const userCredential = await auth.createUserWithEmailAndPassword(email, password);
     authModal.style.display = 'none';
-    // Show profile setup
     profileSetupModal.style.display = 'flex';
   } catch (err) {
     signupMessage.textContent = err.message;
@@ -1236,11 +1237,7 @@ auth.onAuthStateChanged(async (user) => {
     } else {
       landingPage.style.display = 'flex';
       appWrapper.style.display = 'none';
-      // If signed in but no profile, show profile setup? Actually, we already show it after sign-up.
-      // For existing users without profile (if any), we can redirect to profile setup.
-      if (user) {
-        profileSetupModal.style.display = 'flex';
-      }
+      if (user) profileSetupModal.style.display = 'flex';
     }
   } else {
     landingPage.style.display = 'flex';
