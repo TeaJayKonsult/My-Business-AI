@@ -43,37 +43,11 @@
     ::-webkit-scrollbar-thumb{background:var(--primary-dark);border-radius:4px}
     ::-webkit-scrollbar-track{background:transparent}
 
-    /* Glass base */
-    .glass{
-      background:rgba(255,255,255,0.04);
-      backdrop-filter:blur(16px);
-      -webkit-backdrop-filter:blur(16px);
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-    }
-    .glass-strong{
-      background:rgba(255,255,255,0.06);
-      backdrop-filter:blur(24px);
-      -webkit-backdrop-filter:blur(24px);
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-    }
-    .shimmer-text{
-      background:linear-gradient(90deg,var(--primary),var(--secondary),var(--primary));
-      background-size:200% auto;
-      -webkit-background-clip:text;
-      background-clip:text;
-      color:transparent;
-      animation:shimmer 4s linear infinite;
-    }
-    @keyframes shimmer {
-      0%{background-position:-200% center}
-      100%{background-position:200% center}
-    }
+    .glass{background:rgba(255,255,255,0.04);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--border);border-radius:var(--radius);}
+    .glass-strong{background:rgba(255,255,255,0.06);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);}
+    .shimmer-text{background:linear-gradient(90deg,var(--primary),var(--secondary),var(--primary));background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shimmer 4s linear infinite;}
+    @keyframes shimmer{0%{background-position:-200% center}100%{background-position:200% center}}
 
-    /* LANDING, MODAL, DASHBOARD – same as previous Glass Holographic version */
-    /* (We keep the exact styles from the earlier version to save length – they are unchanged) */
     .landing{display:flex;flex-direction:column;min-height:100vh}
     .landing-header{background:rgba(11,11,14,0.8);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:16px 32px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;position:sticky;top:0;z-index:100}
     .logo h1{font-size:22px;font-weight:800;background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -116,7 +90,6 @@
     .btn-pricing:hover{transform:translateY(-2px);box-shadow:0 0 30px rgba(79,172,254,0.2)}
     .footer{text-align:center;padding:24px;font-size:12px;color:var(--muted);border-top:1px solid var(--border)}
 
-    /* Auth Modal */
     .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);backdrop-filter:blur(20px);z-index:2000;justify-content:center;align-items:center}
     .modal-content{background:rgba(255,255,255,0.05);backdrop-filter:blur(32px);-webkit-backdrop-filter:blur(32px);border:1px solid var(--border);max-width:420px;width:90%;padding:32px;border-radius:var(--radius);position:relative;box-shadow:var(--shadow)}
     .close-modal{position:absolute;top:14px;right:18px;font-size:22px;cursor:pointer;color:var(--muted);transition:var(--transition)}
@@ -142,7 +115,6 @@
     .google-btn{width:100%;padding:12px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:40px;color:var(--text);font-weight:500;cursor:pointer;transition:var(--transition);display:flex;align-items:center;justify-content:center;gap:10px;font-family:'Inter',sans-serif}
     .google-btn:hover{background:rgba(255,255,255,0.08);border-color:var(--primary)}
 
-    /* Dashboard (unchanged from Glass Holographic version) */
     .app-wrapper{display:flex;height:100vh;background:var(--bg)}
     .sidebar{width:var(--sidebar-width);background:rgba(255,255,255,0.02);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-right:1px solid var(--border);display:flex;flex-direction:column;transition:var(--transition);z-index:10}
     .sidebar-header{padding:20px;border-bottom:1px solid var(--border)}
@@ -319,7 +291,7 @@
   </div>
 </div>
 
-<!-- ====== AUTH MODAL with Google Sign-In ====== -->
+<!-- ====== AUTH MODAL ====== -->
 <div id="authModal" class="modal">
   <div class="modal-content">
     <span class="close-modal" id="closeModalBtn">&times;</span>
@@ -327,7 +299,6 @@
       <button id="modalSigninTab" class="active">Sign In</button>
       <button id="modalSignupTab">Sign Up</button>
     </div>
-    <!-- Sign In Form -->
     <form id="modalSigninForm">
       <div class="form-group"><input type="email" id="modalSigninEmail" placeholder="Email" required></div>
       <div class="form-group">
@@ -342,7 +313,6 @@
       <button type="submit">Sign In</button>
       <div class="message" id="modalSigninMessage"></div>
     </form>
-    <!-- Sign Up Form -->
     <form id="modalSignupForm" class="hidden">
       <div class="form-group"><input type="email" id="modalSignupEmail" placeholder="Email" required></div>
       <div class="form-group">
@@ -354,11 +324,7 @@
       <button type="submit">Create Account</button>
       <div class="message" id="modalSignupMessage"></div>
     </form>
-
-    <!-- Social Divider -->
     <div class="social-divider"><span>or continue with</span></div>
-
-    <!-- Google Sign-In Button -->
     <button class="google-btn" onclick="signInWithGoogle()">
       <svg style="width:20px;height:20px;" viewBox="0 0 48 48">
         <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/>
@@ -421,6 +387,7 @@
       <div class="header-info"><div class="hi-name">My Business AI</div><div class="hi-biz" id="headerBiz">Loading...</div></div>
       <div class="header-actions">
         <button class="hdr-btn" id="exportChatBtn">📋 Export</button>
+        <button class="hdr-btn" id="refreshChatBtn">🔄 Refresh</button>
       </div>
     </div>
     <div class="categories-bar" id="categoriesBar">
@@ -441,8 +408,6 @@
         <div class="quick-suggestions" id="quickSuggestions"></div>
       </div>
       <div class="messages" id="messages"></div>
-
-      <!-- Blueprint -->
       <div id="blueprintSection" class="blueprint-section" style="display:none;">
         <div class="blueprint-header">
           <h3>📊 Your Business Blueprint</h3>
@@ -450,8 +415,6 @@
         </div>
         <div class="blueprint-grid" id="blueprintGrid"></div>
       </div>
-
-      <!-- Roadmap -->
       <div id="roadmapSection" class="roadmap-section" style="display:none;">
         <div class="roadmap-header">
           <h3>🗺️ Your Roadmap</h3>
@@ -460,7 +423,6 @@
         <div id="roadmapContainer"><div class="roadmap-empty">Your roadmap will appear here. Click "Generate Roadmap" to start.</div></div>
       </div>
     </div>
-
     <div class="input-area">
       <div class="input-wrap">
         <textarea class="msg-input" id="msgInput" placeholder="Ask your business question..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
@@ -510,6 +472,7 @@ const headerBiz = document.getElementById('headerBiz');
 const welcomeMsgDiv = document.getElementById('welcomeMsg');
 const quickSuggestionsDiv = document.getElementById('quickSuggestions');
 const exportChatBtn = document.getElementById('exportChatBtn');
+const refreshChatBtn = document.getElementById('refreshChatBtn');
 const menuToggle = document.getElementById('menuToggle');
 const sidebar = document.getElementById('sidebar');
 const blueprintSection = document.getElementById('blueprintSection');
@@ -534,7 +497,7 @@ let offlineQueue = [];
 const FUNCTION_URL = '/api/call-groq';
 const APP_URL = 'https://my-business-ai.vercel.app';
 
-// ====== TOPIC SUGGESTIONS (unchanged) ======
+// ====== TOPIC SUGGESTIONS ======
 const TOPIC_SUGGESTIONS = {
   'General Business': ['How do I grow my business?', 'What are my biggest risks?', 'How do I attract more customers?', 'Give me a business health check'],
   'Growth Strategy': ['How can I scale my business?', 'Should I expand to a new location?', 'How do I enter a new market?', 'What growth strategies suit my business?'],
@@ -578,8 +541,6 @@ async function signInWithGoogle() {
   try {
     const provider = new firebase.auth.GoogleAuthProvider();
     const result = await auth.signInWithPopup(provider);
-    // After successful sign-in, onAuthStateChanged will trigger
-    // The user will be redirected to the dashboard
     showToast('✅ Signed in with Google!');
   } catch (err) {
     if (err.code === 'auth/popup-closed-by-user') {
@@ -590,10 +551,9 @@ async function signInWithGoogle() {
     console.error('Google Sign-In error:', err);
   }
 }
-// Make it globally accessible
 window.signInWithGoogle = signInWithGoogle;
 
-// ====== OFFLINE QUEUE (unchanged) ======
+// ====== OFFLINE QUEUE ======
 function loadOfflineQueue() {
   const stored = localStorage.getItem('mbai_offline_queue');
   if (stored) { offlineQueue = JSON.parse(stored); if (offlineQueue.length > 0) showToast(offlineQueue.length + ' message(s) pending. Will send when online.'); processOfflineQueue(); }
@@ -630,7 +590,7 @@ async function sendQueuedMessage(item) {
   if (reply) { appendMsg(reply, 'bot', true); chatHistory.push({ role: 'assistant', text: reply }); await refreshConversationList(); }
 }
 
-// ====== CHAT UI (unchanged) ======
+// ====== CHAT UI ======
 function formatText(text) {
   return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
@@ -685,7 +645,6 @@ function appendMsgToDOM(text, role, msgId = null) {
     copyBtn.textContent = '📋 Copy';
     copyBtn.onclick = () => { navigator.clipboard.writeText(text); showToast('Copied to clipboard'); };
     bubble.appendChild(copyBtn);
-    // Action Panel
     const actionPanel = document.createElement('div');
     actionPanel.className = 'action-panel';
     const actions = [
@@ -978,7 +937,7 @@ async function toggleRoadmapStep(phaseIdx, stepIdx) {
   showToast(step.completed ? '✅ Step completed!' : '↩️ Step uncompleted');
 }
 
-// ====== CONVERSATIONS (unchanged) ======
+// ====== CONVERSATIONS ======
 async function loadConversations() {
   if (!currentUser) return;
   const snapshot = await db.collection('users').doc(currentUser.uid).collection('conversations').orderBy('updatedAt', 'desc').get();
@@ -1011,19 +970,54 @@ function renderConversationList() {
     conversationList.appendChild(div);
   });
 }
+
+// ====== FIXED: switchConversation with message normalization ======
 async function switchConversation(convId) {
   if (isLoading) return;
   currentConversationId = convId;
   try {
     const doc = await db.collection('users').doc(currentUser.uid).collection('conversations').doc(convId).get();
-    if (doc.exists) chatHistory = doc.data().messages || [];
-    else chatHistory = [];
+    if (doc.exists) {
+      const data = doc.data();
+      let messages = data.messages || [];
+      
+      // Normalize messages: ensure each has an id, role, and text
+      chatHistory = messages.map(msg => ({
+        id: msg.id || Date.now() + '-' + Math.random(),
+        role: msg.role || (msg.sender === 'user' ? 'user' : 'bot'),
+        text: msg.text || msg.content || msg.message || JSON.stringify(msg)
+      }));
+      
+      console.log('📝 Loaded messages:', chatHistory.length);
+    } else {
+      chatHistory = [];
+    }
     messagesDiv.innerHTML = '';
-    for (const msg of chatHistory) { appendMsgToDOM(msg.text, msg.role, msg.id); }
+    for (const msg of chatHistory) {
+      appendMsgToDOM(msg.text, msg.role, msg.id);
+    }
     welcomeMsgDiv.style.display = chatHistory.length === 0 ? 'block' : 'none';
     renderConversationList();
-  } catch (err) { console.error('Error switching conversation:', err); showToast('Failed to load conversation'); }
+  } catch (err) {
+    console.error('Error switching conversation:', err);
+    showToast('Failed to load conversation');
+  }
 }
+// Expose switchConversation globally for debugging
+window.switchConversation = switchConversation;
+
+// ====== REFRESH BUTTON HANDLER ======
+refreshChatBtn?.addEventListener('click', async () => {
+  if (currentConversationId) {
+    showToast('🔄 Refreshing conversation...');
+    await switchConversation(currentConversationId);
+    showToast('✅ Conversation refreshed');
+  } else {
+    showToast('No conversation to refresh');
+  }
+});
+
+// ====== CREATE NEW CONVERSATION ======
 async function createNewConversation() {
   if (isLoading) return;
   const convRef = db.collection('users').doc(currentUser.uid).collection('conversations').doc();
@@ -1037,6 +1031,7 @@ async function createNewConversation() {
   welcomeMsgDiv.style.display = 'block';
   if (window.innerWidth <= 768) sidebar.classList.remove('open');
 }
+
 function exportChat() {
   if (chatHistory.length === 0) { showToast('No conversation to export yet.'); return; }
   let text = 'My Business AI — Consultation Report\nBusiness: ' + userProfile.bizName + ' (' + userProfile.bizType + ')\nDate: ' + new Date().toLocaleDateString() + '\n\n';
@@ -1073,7 +1068,7 @@ function showMainApp() {
   loadBlueprintFromFirestore();
 }
 
-// ====== AUTH MODAL (unchanged) ======
+// ====== AUTH MODAL ======
 const authModal = document.getElementById('authModal');
 const signinTab = document.getElementById('modalSigninTab');
 const signupTab = document.getElementById('modalSignupTab');
