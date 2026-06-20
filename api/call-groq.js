@@ -99,7 +99,7 @@ module.exports = async function handler(req, res) {
 
   let needStructuredOutput = isBlueprintRequest || isRoadmapRequest;
 
-  // ====== BUILD MESSAGES ======
+  // ====== BUILD MESSAGES (FIXED) ======
   const messages = [
     { role: 'system', content: system || 'You are a helpful business consultant.' }
   ];
@@ -107,11 +107,36 @@ module.exports = async function handler(req, res) {
   // Add conversation history if provided (last 10 messages)
   if (history && history.length > 0) {
     const recent = history.slice(-10);
+    let lastRole = 'system'; // start with system
+
     for (const msg of recent) {
-      messages.push({ role: msg.role === 'user' ? 'user' : 'assistant', content: msg.text });
+      // Skip messages without content
+      const content = msg.text || msg.content;
+      if (!content) continue;
+
+      // Determine role
+      let role = msg.role === 'user' ? 'user' : 'assistant';
+      if (role === 'user' && lastRole === 'user') {
+        // If we have two user messages in a row, insert a placeholder assistant message
+        messages.push({ role: 'assistant', content: 'I understand. Please continue.' });
+        lastRole = 'assistant';
+      }
+      if (role === 'assistant' && lastRole === 'assistant') {
+        // If we have two assistant messages in a row, skip the duplicate
+        continue;
+      }
+
+      messages.push({ role, content });
+      lastRole = role;
     }
   }
 
+  // Add the current user prompt
+  if (messages.length > 0 && messages[messages.length - 1].role === 'user') {
+    // If the last message is already a user, we need to insert an assistant message
+    // (shouldn't happen with the logic above, but just in case)
+    messages.push({ role: 'assistant', content: 'I understand. Let me think about that.' });
+  }
   messages.push({ role: 'user', content: userPrompt });
 
   // ====== ADD STRUCTURED OUTPUT INSTRUCTIONS ======
@@ -149,7 +174,10 @@ module.exports = async function handler(req, res) {
   }
 
   if (structuredPrompt) {
-    messages[0].content += '\n\n' + structuredPrompt;
+    // Only add to the system message if it's not already there
+    if (!messages[0].content.includes('IMPORTANT:')) {
+      messages[0].content += '\n\n' + structuredPrompt;
+    }
   }
 
   // ====== CALL GROQ API ======
@@ -212,12 +240,10 @@ module.exports = async function handler(req, res) {
         if (parsed.roadmap) {
           roadmap = parsed.roadmap;
         }
-        // If no text field, use the entire JSON as reply
         if (!parsed.text) {
           reply = content;
         }
       } catch (e) {
-        // If JSON parsing fails, use content as reply
         reply = content;
         console.warn('Failed to parse JSON response:', e.message);
       }
